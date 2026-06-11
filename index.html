@@ -490,6 +490,12 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
 // 常數
 // ════════════════════════════════════════
 const SERVER = window.location.origin;
+const R2_CARD_BASE = 'https://pub-ae522ba0c40d4e8192effdaf41dae7f5.r2.dev';
+const IS_GITHUB = window.location.hostname.includes('github.io');
+function cardUrl(filename){
+  if(IS_GITHUB) return `${R2_CARD_BASE}/${encodeURIComponent(filename)}`;
+  return `${SERVER}/card/${encodeURIComponent(filename)}`;
+}
 const PROFILES_KEY = 'ptcg_profiles_v3';
 const PIN_KEY      = 'ptcg_pin_v3';
 const LIFE_KEY     = 'ptcg_life_v3';
@@ -946,10 +952,10 @@ function newProfile(name,avatar){
 // 伺服器 & 卡池
 // ════════════════════════════════════════
 async function checkServer(){
-  // GitHub Pages 模式：不需要伺服器，直接顯示雲端模式
   const isGitHubPages = window.location.hostname.includes('github.io');
   if(isGitHubPages){
-    setStatus(true,'☁️ 雲端模式（無卡圖）');return false;
+    setStatus(true,'☁️ 雲端模式（R2 卡圖）');
+    return false;
   }
   try{
     const r=await fetch(`${SERVER}/api/cards?page=1`,{signal:AbortSignal.timeout(3000)});
@@ -957,6 +963,19 @@ async function checkServer(){
   }catch(e){}
   setStatus(false,'伺服器未連線');return false;
 }
+async function loadCardPool(){
+  if(S.cardPoolLoaded) return;
+  const isGitHubPages = window.location.hostname.includes('github.io');
+  if(isGitHubPages){
+    // GitHub Pages 模式：直接用 R2，卡池用固定數字
+    S.cardPool = Array.from({length:13904}, (_,i)=>`${i+1}.png`).filter(f=>{
+      // 過濾掉不存在的編號（用已知範圍）
+      return true;
+    });
+    S.cardPoolLoaded = true;
+    console.log(`R2 模式：卡池 ${S.cardPool.length} 張`);
+    return;
+  }
 function setStatus(online,text){
   document.querySelectorAll('.status-dot').forEach(d=>d.classList.toggle('online',online));
   document.querySelectorAll('#statusText,#gameStatusText').forEach(el=>el.textContent=text);
@@ -1294,7 +1313,7 @@ function triggerDraw(){
   document.getElementById('drawCardName').textContent='';
   document.getElementById('drawScore').textContent=R.correctCount;
   document.getElementById('drawOverlay').classList.add('show');
-  document.getElementById('drawCardImg').src=`${SERVER}/card/${encodeURIComponent(pendingCard)}`;
+  document.getElementById('drawCardImg').src=cardUrl(pendingCard);
 }
 function flipCard(){
   if(cardFlipped) return;cardFlipped=true;
@@ -1328,7 +1347,7 @@ function renderCollection(){
   }
   document.getElementById('collectionGrid').innerHTML=p.collected.slice().reverse().map(f=>
     `<div class="card-thumb" onclick="viewCard('${encodeURIComponent(f)}','${f.replace(/\.[^.]+$/,'')}')">
-      <img src="${SERVER}/card/${encodeURIComponent(f)}" loading="lazy" alt="${f}">
+      <img src="${cardUrl(f)}" loading="lazy" alt="${f}">
     </div>`
   ).join('');
 }
@@ -1342,7 +1361,7 @@ function updateCollStats(){
 function viewCard(encoded,name){
   const div=document.createElement('div');
   div.style.cssText='position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;';
-  div.innerHTML=`<img src="${SERVER}/card/${encoded}" style="max-width:88%;max-height:68vh;border-radius:16px;box-shadow:0 0 40px rgba(245,158,11,.5)">
+  div.innerHTML=`<img src="${cardUrl(encoded)}" style="max-width:88%;max-height:68vh;border-radius:16px;box-shadow:0 0 40px rgba(245,158,11,.5)">
     <div style="color:var(--accent);font-size:15px;font-weight:700">${name}</div>
     <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:10px 26px;color:#fff;font-size:15px;cursor:pointer">關閉</button>`;
   document.body.appendChild(div);
