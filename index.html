@@ -952,8 +952,7 @@ function newProfile(name,avatar){
 // 伺服器 & 卡池
 // ════════════════════════════════════════
 async function checkServer(){
-  const isGitHubPages = window.location.hostname.includes('github.io');
-  if(isGitHubPages){
+  if(IS_GITHUB){
     setStatus(true,'☁️ 雲端模式（R2 卡圖）');
     return false;
   }
@@ -963,25 +962,18 @@ async function checkServer(){
   }catch(e){}
   setStatus(false,'伺服器未連線');return false;
 }
-async function loadCardPool(){
-  if(S.cardPoolLoaded) return;
-  const isGitHubPages = window.location.hostname.includes('github.io');
-  if(isGitHubPages){
-    // GitHub Pages 模式：直接用 R2，卡池用固定數字
-    S.cardPool = Array.from({length:13904}, (_,i)=>`${i+1}.png`).filter(f=>{
-      // 過濾掉不存在的編號（用已知範圍）
-      return true;
-    });
-    S.cardPoolLoaded = true;
-    console.log(`R2 模式：卡池 ${S.cardPool.length} 張`);
-    return;
-  }
 function setStatus(online,text){
   document.querySelectorAll('.status-dot').forEach(d=>d.classList.toggle('online',online));
   document.querySelectorAll('#statusText,#gameStatusText').forEach(el=>el.textContent=text);
 }
 async function loadCardPool(){
   if(S.cardPoolLoaded) return;
+  if(IS_GITHUB){
+    S.cardPool = Array.from({length:13904}, (_,i)=>`${i+2}.png`);
+    S.cardPoolLoaded = true;
+    updateCollStats();
+    return;
+  }
   try{
     let all=[],page=1,total=Infinity;
     while(all.length<total){
