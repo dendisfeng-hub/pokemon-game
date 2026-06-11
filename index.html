@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="寶可夢學習">
+<title>寶可夢集卡學習遊戲</title>
+<style>
+:root{
+  --bg:#0f0c29;--bg2:#1a1a3e;--card-bg:#1e1b4b;
+  --accent:#f59e0b;--accent2:#ec4899;--green:#10b981;
+  --red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;--teal:#14b8a6;
+  --text:#f1f5f9;--text2:#94a3b8;--border:#334155;--radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-height:100vh;font-family:'Helvetica Neue','PingFang TC','Noto Sans TC',sans-serif;color:var(--text);overflow-x:hidden;}
+
+/* ── 頂部 ── */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,12,41,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.topbar-logo{font-size:18px;}
+.topbar-title{font-size:13px;font-weight:700;flex:1;}
+.chip{border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;background:var(--card-bg);border:1px solid var(--border);white-space:nowrap;}
+.chip.gold{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;}
+.chip.teal{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;border:none;}
+
+/* ── 底部導覽 ── */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(15,12,41,0.97);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px;background:none;border:none;color:var(--text2);font-size:10px;cursor:pointer;}
+.nav-btn .icon{font-size:20px;}
+.nav-btn.active{color:var(--accent);}
+
+/* ── 主內容 ── */
+.main{padding:68px 14px 88px;max-width:600px;margin:0 auto;}
+.page{display:none;}
+.page.active{display:block;}
+
+/* ── 登入 ── */
+.login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 18px;gap:18px;}
+.login-logo{font-size:68px;animation:bounce 2s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.login-title{font-size:26px;font-weight:900;text-align:center;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.profile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;}
+.profile-card{background:var(--card-bg);border:2px solid var(--border);border-radius:var(--radius);padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transition:all .2s;}
+.profile-card:active{border-color:var(--accent);transform:scale(1.03);}
+.profile-avatar{font-size:34px;}
+.profile-name{font-size:15px;font-weight:700;}
+.profile-stats{font-size:11px;color:var(--text2);text-align:center;}
+.btn-add-profile{background:none;border:2px dashed var(--border);border-radius:var(--radius);padding:14px;width:100%;color:var(--text2);font-size:14px;cursor:pointer;}
+.btn-add-profile:active{border-color:var(--accent);color:var(--accent);}
+
+/* ── 回合進度 ── */
+.round-bar{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;}
+.round-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.round-label{font-size:13px;color:var(--text2);}
+.round-score{font-size:17px;font-weight:900;}
+.progress-track{background:rgba(255,255,255,0.08);border-radius:10px;height:9px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width .4s;}
+.progress-fill.good{background:linear-gradient(90deg,var(--green),var(--teal));}
+.q-dots{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.q-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .3s;}
+.q-dot.correct{background:var(--green);border-color:var(--green);color:#fff;}
+.q-dot.wrong{background:var(--red);border-color:var(--red);color:#fff;}
+.q-dot.changed{background:var(--accent);border-color:var(--accent);color:#000;}
+.q-dot.current{border-color:var(--accent);box-shadow:0 0 7px var(--accent);}
+
+/* ── 題目 ── */
+.question-box{background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(139,92,246,.1));border:1px solid rgba(59,130,246,.3);border-radius:var(--radius);padding:18px;margin-bottom:12px;min-height:85px;}
+.q-meta{font-size:12px;color:var(--text2);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;}
+.q-text{font-size:20px;font-weight:700;line-height:1.5;}
+.q-change-badge{background:rgba(245,158,11,.2);border:1px solid var(--accent);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--accent);}
+
+/* ── 選項 ── */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.opt-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:12px;padding:14px 8px;font-size:16px;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s;text-align:center;min-height:54px;font-family:inherit;}
+.opt-btn:active{transform:scale(.97);}
+.opt-btn.correct{background:rgba(16,185,129,.2);border-color:var(--green);color:var(--green);}
+.opt-btn.wrong{background:rgba(239,68,68,.13);border-color:var(--red);color:var(--red);}
+.opt-btn.disabled{pointer-events:none;}
+.opt-btn.changeable{border-color:var(--accent);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4);}50%{box-shadow:0 0 0 5px rgba(245,158,11,0);}}
+.change-hint{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);border-radius:12px;padding:11px 13px;margin-bottom:12px;font-size:13px;color:var(--accent);display:none;}
+.change-hint.show{display:block;}
+
+/* ── 答錯解析 ── */
+.explanation-box{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:13px 14px;margin-bottom:12px;font-size:14px;line-height:1.6;}
+.explanation-box .ex-wrong{color:var(--red);font-weight:700;margin-bottom:4px;font-size:13px;}
+.explanation-box .ex-correct{color:var(--green);font-weight:700;margin-bottom:6px;font-size:13px;}
+.explanation-box .ex-text{color:var(--text);}
+
+/* ── 結算 ── */
+.result-screen{text-align:center;padding:20px 0;}
+.result-emoji{font-size:72px;margin-bottom:10px;}
+.result-title{font-size:26px;font-weight:900;margin-bottom:5px;}
+.result-sub{font-size:14px;color:var(--text2);margin-bottom:20px;}
+.score-circle{width:130px;height:130px;border-radius:50%;margin:0 auto 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid var(--green);background:rgba(16,185,129,.1);}
+.score-circle.fail{border-color:var(--red);background:rgba(239,68,68,.1);}
+.score-big{font-size:44px;font-weight:900;color:var(--green);}
+.score-circle.fail .score-big{color:var(--red);}
+.score-label{font-size:13px;color:var(--text2);}
+.result-detail{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:16px;text-align:left;}
+.result-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.result-row:last-child{border-bottom:none;}
+
+/* ── 抽卡 ── */
+.draw-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.draw-overlay.show{opacity:1;pointer-events:all;}
+.draw-title{font-size:18px;font-weight:700;color:var(--accent);text-align:center;}
+.draw-card-wrap{position:relative;width:190px;height:266px;perspective:1000px;}
+.draw-card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.4,0,.2,1);}
+.draw-card-inner.flipped{transform:rotateY(180deg);}
+.draw-card-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;overflow:hidden;box-shadow:0 0 36px rgba(245,158,11,.5);}
+.draw-card-back{background:linear-gradient(135deg,#1e40af,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:68px;}
+.draw-card-front{transform:rotateY(180deg);background:#111;}
+.draw-card-front img{width:100%;height:100%;object-fit:contain;}
+.draw-card-name{font-size:13px;font-weight:700;color:var(--accent);text-align:center;}
+.draw-tap-hint{color:var(--text2);font-size:14px;}
+.draw-btn-next{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:30px;padding:13px 36px;font-size:15px;font-weight:700;color:#000;cursor:pointer;display:none;font-family:inherit;}
+.draw-btn-next.show{display:block;}
+
+/* ── 圖鑑 ── */
+.coll-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat-box{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:11px;text-align:center;}
+.stat-num{font-size:20px;font-weight:900;color:var(--accent);}
+.stat-lbl{font-size:11px;color:var(--text2);margin-top:2px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.card-thumb{aspect-ratio:2/3;border-radius:10px;overflow:hidden;background:var(--card-bg);border:1px solid var(--border);cursor:pointer;transition:transform .2s;}
+.card-thumb:active{transform:scale(.95);}
+.card-thumb img{width:100%;height:100%;object-fit:cover;}
+
+/* ── 生活表現 ── */
+.life-item{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;}
+.life-item:active{border-color:var(--accent);}
+.life-item-pts{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-weight:900;font-size:13px;border-radius:20px;padding:3px 9px;white-space:nowrap;}
+.life-item-name{flex:1;font-size:15px;}
+.life-item-check{font-size:20px;opacity:.3;transition:opacity .2s;}
+.life-item.done .life-item-check{opacity:1;}
+.life-item.done{border-color:var(--green);background:rgba(16,185,129,.07);}
+.daily-pts-box{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(236,72,153,.15));border:1px solid rgba(245,158,11,.4);border-radius:var(--radius);padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.daily-pts-label{font-size:13px;color:var(--text2);}
+.daily-pts-num{font-size:28px;font-weight:900;color:var(--accent);}
+.total-pts-box{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px;}
+
+/* ── 兌換商店 ── */
+.shop-item{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.shop-item-icon{font-size:32px;}
+.shop-item-info{flex:1;}
+.shop-item-name{font-size:15px;font-weight:700;}
+.shop-item-cost{font-size:13px;color:var(--accent);margin-top:2px;}
+.shop-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:700;color:#000;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.shop-btn:disabled{background:var(--border);color:var(--text2);cursor:not-allowed;}
+
+/* ── 成就 ── */
+.achieve-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.achieve-item:last-child{border-bottom:none;}
+.achieve-icon{font-size:24px;width:32px;text-align:center;}
+.achieve-info{flex:1;}
+.achieve-name{font-size:14px;font-weight:600;}
+.achieve-desc{font-size:12px;color:var(--text2);}
+.achieve-check{color:var(--green);font-size:18px;}
+
+/* ── 紀錄 ── */
+.log-item{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.log-date{font-size:12px;color:var(--text2);margin-bottom:4px;}
+.log-content{font-size:14px;}
+
+/* ── 通用 ── */
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.card-title{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.btn{border:none;border-radius:30px;padding:13px 22px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;font-family:inherit;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;}
+.btn-secondary{background:var(--card-bg);border:1px solid var(--border);color:var(--text);}
+.btn:active{transform:scale(.97);}
+.btn-sm{padding:8px 16px;font-size:13px;width:auto;}
+.modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;width:100%;max-width:420px;transform:scale(.9);transition:transform .2s;max-height:90vh;overflow-y:auto;}
+.modal-overlay.show .modal{transform:scale(1);}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;}
+.form-label{font-size:13px;color:var(--text2);}
+.form-input,.form-select{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:11px;color:var(--text);font-size:15px;width:100%;font-family:inherit;}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--accent);}
+.form-select option{background:var(--bg2);}
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:9px 0;}
+.avatar-opt{font-size:25px;text-align:center;padding:6px;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:all .2s;}
+.avatar-opt.selected{border-color:var(--accent);background:rgba(245,158,11,.1);}
+.pin-dots{display:flex;gap:12px;justify-content:center;}
+.pin-dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--border);transition:all .2s;}
+.pin-dot.filled{background:var(--accent);border-color:var(--accent);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px;}
+.pin-key{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:20px;font-weight:700;text-align:center;cursor:pointer;}
+.pin-key:active{background:var(--border);}
+.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-14px);background:var(--green);color:#fff;border-radius:30px;padding:10px 20px;font-size:14px;font-weight:700;z-index:400;opacity:0;transition:all .3s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--red);}
+.server-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--red);}
+.status-dot.online{background:var(--green);}
+.subject-tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;}
+.subject-tabs::-webkit-scrollbar{display:none;}
+.subject-tab{flex-shrink:0;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap;}
+.subject-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#000;font-weight:700;}
+.empty-state{text-align:center;padding:40px 16px;color:var(--text2);}
+.empty-state .e{font-size:44px;margin-bottom:10px;}
+.loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:22px;color:var(--text2);}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.section-title{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;margin-top:18px;}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+@media(min-width:480px){.cards-grid{grid-template-columns:repeat(4,1fr);}}
+
+/* ── 國旗題目圖片 ── */
+.flag-question-img{display:flex;align-items:center;justify-content:center;margin:10px 0 6px;}
+.flag-question-img img{width:160px;height:auto;border-radius:8px;border:2px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,.4);}
+.flag-opt-img{display:flex;align-items:center;gap:8px;}
+.flag-opt-img img{width:36px;height:auto;border-radius:4px;border:1px solid rgba(255,255,255,.2);}
+
+/* ── 世界地圖 ── */
+.map-continent-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
+.map-continent-tabs::-webkit-scrollbar{display:none;}
+.map-ctab{flex-shrink:0;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;white-space:nowrap;}
+.map-ctab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#000;font-weight:700;}
+.flag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+@media(min-width:400px){.flag-grid{grid-template-columns:repeat(4,1fr);}}
+.flag-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .2s;}
+.flag-card:active{transform:scale(.95);border-color:var(--accent);}
+.flag-card img{width:100%;max-width:72px;height:auto;border-radius:5px;border:1px solid rgba(255,255,255,.1);}
+.flag-card-name{font-size:10px;text-align:center;color:var(--text2);line-height:1.3;}
+
+/* ── 台灣縣市卡片 ── */
+.tw-region-title{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;font-weight:700;}
+.tw-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;}
+.tw-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;}
+.tw-card:active{transform:scale(.97);border-color:var(--accent);}
+.tw-card-icon{font-size:26px;flex-shrink:0;}
+.tw-card-info{flex:1;min-width:0;}
+.tw-card-name{font-size:14px;font-weight:700;}
+.tw-card-sub{font-size:11px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tw-detail-tag{display:inline-block;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:20px;padding:3px 10px;font-size:12px;margin:3px 2px;color:var(--accent);}
+</style>
+</head>
+<body>
+
+<!-- ══ 登入 ══ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-logo">🎮</div>
+  <div class="login-title">寶可夢集卡<br>學習冒險</div>
+  <div style="color:var(--text2);font-size:14px">選擇你的冒險者</div>
+  <div class="profile-grid" id="profileGrid"></div>
+  <button class="btn-add-profile" onclick="showAddProfile()">➕ 新增小朋友</button>
+  <button class="btn btn-secondary" style="margin-top:4px;width:auto;padding:10px 22px;font-size:13px" onclick="showParentLogin()">🔒 家長後台</button>
+  <div class="server-status"><div class="status-dot" id="statusDot"></div><span id="statusText">連線中...</span></div>
+</div>
+
+<!-- ══ 遊戲主畫面 ══ -->
+<div id="gameScreen" style="display:none">
+  <div class="topbar">
+    <div class="topbar-logo">🎮</div>
+    <div class="topbar-title">寶可夢集卡學習</div>
+    <div class="chip" id="topCollected">🃏 0</div>
+    <div class="chip teal" id="topPts">⭐ 0分</div>
+    <div class="chip" id="topUser" style="cursor:pointer" onclick="logout()">登出</div>
+  </div>
+  <div class="main">
+
+    <!-- 答題頁 -->
+    <div id="pageQuiz" class="page active">
+      <div id="subjectPicker">
+        <div class="subject-tabs" id="subjectTabs"></div>
+        <div class="card" style="text-align:center;padding:28px">
+          <div style="font-size:44px;margin-bottom:10px">🎯</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:5px">選擇科目開始本回合</div>
+          <div style="font-size:13px;color:var(--text2)">每回合 10 題，答對 8 題以上即可抽卡</div>
+          <div style="font-size:13px;color:var(--accent);margin-top:6px">💡 每回合有 1 次改答機會</div>
+        </div>
+      </div>
+      <div id="quizArea" style="display:none">
+        <div class="round-bar">
+          <div class="round-info">
+            <span class="round-label" id="roundLabel">第 1 / 10 題</span>
+            <span class="round-score" id="roundScore">答對：<b style="color:var(--green)">0</b> / 10</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <div class="q-dots" id="qDots"></div>
+        </div>
+        <div class="change-hint" id="changeHint">⚡ 答錯了！你還有 1 次改答機會，點選其他答案即可更改！</div>
+        <div class="question-box">
+          <div class="q-meta">
+            <span id="qSubjectLabel"></span>
+            <span id="qChangedBadge" class="q-change-badge" style="display:none">✏️ 已改答</span>
+          </div>
+          <div class="q-text" id="qText"></div>
+        </div>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="explanation-box" id="explanationBox" style="display:none"></div>
+        <button class="btn btn-primary" id="btnNext" style="display:none" onclick="nextQuestion()">下一題 ➡️</button>
+      </div>
+      <div id="resultArea" style="display:none">
+        <div class="result-screen">
+          <div class="result-emoji" id="resultEmoji"></div>
+          <div class="result-title" id="resultTitle"></div>
+          <div class="result-sub" id="resultSub"></div>
+          <div class="score-circle" id="scoreCircle">
+            <div class="score-big" id="scoreBig"></div>
+            <div class="score-label">/ 10</div>
+          </div>
+          <div class="result-detail">
+            <div class="result-row"><span>本回合答對</span><span id="rCorrect" style="font-weight:700;color:var(--green)"></span></div>
+            <div class="result-row"><span>改答次數</span><span id="rChanged"></span></div>
+            <div class="result-row"><span>抽卡門檻（≥8題）</span><span id="rDraw"></span></div>
+            <div class="result-row"><span>累計收藏</span><span id="rCollected" style="color:var(--accent)"></span></div>
+          </div>
+          <button class="btn btn-primary" id="btnDraw" onclick="triggerDraw()" style="display:none;margin-bottom:10px">🎴 翻開卡片！</button>
+          <button class="btn btn-secondary" onclick="startNewRound()">再來一回合</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 圖鑑頁 -->
+    <div id="pageCollection" class="page">
+      <div class="coll-stats">
+        <div class="stat-box"><div class="stat-num" id="statCollected">0</div><div class="stat-lbl">已收藏</div></div>
+        <div class="stat-box"><div class="stat-num" id="statTotal">?</div><div class="stat-lbl">卡池總數</div></div>
+        <div class="stat-box"><div class="stat-num" id="statPct">0.00%</div><div class="stat-lbl">完成度</div></div>
+      </div>
+      <div id="collectionGrid" class="cards-grid"></div>
+      <div id="collectionLoading" class="loading"><div class="spinner"></div>載入中...</div>
+    </div>
+
+    <!-- 生活表現頁 -->
+    <div id="pageLife" class="page">
+      <!-- 今日積分 -->
+      <div class="daily-pts-box">
+        <div><div class="daily-pts-label">今日已獲得</div><div class="daily-pts-num" id="dailyPts">0 分</div></div>
+        <div style="text-align:right"><div class="daily-pts-label">累計總分</div><div style="font-size:22px;font-weight:900;color:var(--teal)" id="totalPts">0 分</div></div>
+      </div>
+      <!-- 今日項目 -->
+      <div class="card-title" style="margin-bottom:10px">📋 今日生活表現打卡</div>
+      <div id="lifeItemList"></div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="submitDailyLife()">✅ 送出今日紀錄給家長審核</button>
+      <hr class="divider">
+      <!-- 兌換商店 -->
+      <div class="card-title" style="margin-bottom:10px">🛒 點數兌換商店</div>
+      <div id="shopList"></div>
+      <hr class="divider">
+      <!-- 兌換紀錄 -->
+      <div class="card-title" style="margin-bottom:10px">📜 最近紀錄</div>
+      <div id="lifeLogList"></div>
+    </div>
+
+    <!-- 成就頁 -->
+    <div id="pageAchieve" class="page">
+      <div class="card">
+        <div class="card-title">🏆 學習成就</div>
+        <div id="achieveList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 各科答題數</div>
+        <div id="subjectStats"></div>
+      </div>
+    </div>
+
+    <!-- 世界地圖頁 -->
+    <div id="pageMap" class="page">
+      <div class="map-continent-tabs" id="continentTabs"></div>
+      <input type="text" id="flagSearch" placeholder="🔍 搜尋國家／縣市名稱..." oninput="filterFlags()" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:10px;">
+      <!-- 國旗格 -->
+      <div class="flag-grid" id="flagGrid"></div>
+      <!-- 台灣縣市格 -->
+      <div id="taiwanGrid" style="display:none"></div>
+    </div>
+
+    <!-- 設定頁 -->
+    <div id="pageSettings" class="page">
+      <div class="card">
+        <div class="card-title">👤 帳號資料</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div style="font-size:42px" id="settingAvatar"></div>
+          <div>
+            <div style="font-size:18px;font-weight:700" id="settingName"></div>
+            <div style="font-size:13px;color:var(--text2)">累計答對 <span id="settingTotal"></span> 題</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="logout()">登出</button>
+      </div>
+      <div class="card">
+        <div class="card-title">📡 伺服器狀態</div>
+        <div class="server-status" style="font-size:14px"><div class="status-dot" id="gameStatusDot"></div><span id="gameStatusText">檢查中...</span></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="bottomnav">
+    <button class="nav-btn active" onclick="switchPage('Quiz',this)"><div class="icon">✏️</div>答題</button>
+    <button class="nav-btn" onclick="switchPage('Collection',this)"><div class="icon">📖</div>圖鑑</button>
+    <button class="nav-btn" onclick="switchPage('Life',this)"><div class="icon">🌟</div>生活</button>
+    <button class="nav-btn" onclick="switchPage('Map',this)"><div class="icon">🌍</div>地圖</button>
+    <button class="nav-btn" onclick="switchPage('Achieve',this)"><div class="icon">🏆</div>成就</button>
+    <button class="nav-btn" onclick="switchPage('Settings',this)"><div class="icon">⚙️</div>設定</button>
+  </div>
+</div>
+
+<!-- ══ 抽卡動畫 ══ -->
+<div class="draw-overlay" id="drawOverlay">
+  <div class="draw-title">🎉 達標！答對 <span id="drawScore"></span>/10 題<br>翻開你的卡片！</div>
+  <div class="draw-card-wrap" onclick="flipCard()">
+    <div class="draw-card-inner" id="drawCardInner">
+      <div class="draw-card-face draw-card-back">🃏</div>
+      <div class="draw-card-face draw-card-front"><img id="drawCardImg" src="" alt=""></div>
+    </div>
+  </div>
+  <div class="draw-tap-hint" id="drawHint">👆 點擊翻牌</div>
+  <div class="draw-card-name" id="drawCardName"></div>
+  <button class="draw-btn-next" id="drawBtnNext" onclick="closeDrawAndContinue()">繼續 ➡️</button>
+</div>
+
+<!-- ══ 彈窗：新增小朋友 ══ -->
+<div class="modal-overlay" id="addProfileModal">
+  <div class="modal">
+    <div class="modal-title">➕ 新增小朋友</div>
+    <div class="form-group"><div class="form-label">選擇頭像</div><div class="avatar-grid" id="avatarGrid"></div></div>
+    <div class="form-group"><div class="form-label">名字（最多6字）</div><input class="form-input" id="newProfileName" placeholder="輸入名字" maxlength="6"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary" onclick="closeModal('addProfileModal')">取消</button>
+      <button class="btn btn-primary" onclick="addProfile()">確定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 彈窗：家長 PIN ══ -->
+<div class="modal-overlay" id="parentPinModal">
+  <div class="modal">
+    <div class="modal-title">🔒 家長後台</div>
+    <div style="text-align:center;padding:18px 0">
+      <div style="color:var(--text2);font-size:14px;margin-bottom:14px">輸入家長 PIN 碼</div>
+      <div class="pin-dots" id="pinDots"></div>
+      <div class="pin-pad" id="pinPad"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 家長後台 ══ -->
+<div id="parentScreen" style="display:none">
+  <div class="topbar">
+    <div class="topbar-logo">🔒</div>
+    <div class="topbar-title">家長後台</div>
+    <button style="background:none;border:none;color:var(--text2);font-size:14px;cursor:pointer;padding:6px 10px" onclick="closeParent()">← 返回</button>
+  </div>
+  <div class="main">
+    <div class="card"><div class="card-title">👶 各小朋友進度</div><div id="parentProgressList"></div></div>
+    <div class="card"><div class="card-title">🌟 待審核生活表現</div><div id="pendingList"></div></div>
+    <div class="card"><div class="card-title">🛒 管理兌換商品</div>
+      <div id="shopManageList" style="margin-bottom:12px"></div>
+      <button class="btn btn-primary btn-sm" onclick="showAddShop()">+ 新增商品</button>
+    </div>
+    <div class="card"><div class="card-title">🔑 修改 PIN 碼</div>
+      <div class="form-group"><input class="form-input" id="newPinInput" type="tel" placeholder="輸入新 PIN（4位數）" maxlength="4" style="text-align:center;letter-spacing:8px;font-size:22px"></div>
+      <button class="btn btn-primary" onclick="changePin()">儲存</button>
+    </div>
+    <div class="card"><div class="card-title">💾 資料備份</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="exportBackup()">匯出</button>
+        <button class="btn btn-secondary" onclick="importBackup()">匯入</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="doImport(this)">
+    </div>
+  </div>
+</div>
+
+<!-- ══ 彈窗：新增商品 ══ -->
+<div class="modal-overlay" id="addShopModal">
+  <div class="modal">
+    <div class="modal-title">🛒 新增兌換商品</div>
+    <div class="form-group"><div class="form-label">商品名稱</div><input class="form-input" id="shopItemName" placeholder="例如：看一集卡通"></div>
+    <div class="form-group"><div class="form-label">商品圖示（emoji）</div><input class="form-input" id="shopItemIcon" placeholder="例如：📺" maxlength="4"></div>
+    <div class="form-group"><div class="form-label">所需點數</div><input class="form-input" id="shopItemCost" type="number" placeholder="例如：20" min="1"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary" onclick="closeModal('addShopModal')">取消</button>
+      <button class="btn btn-primary" onclick="addShopItem()">新增</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════
+// 常數
+// ════════════════════════════════════════
+const SERVER = window.location.origin;
+const PROFILES_KEY = 'ptcg_profiles_v3';
+const PIN_KEY      = 'ptcg_pin_v3';
+const LIFE_KEY     = 'ptcg_life_v3';
+const SHOP_KEY     = 'ptcg_shop_v3';
+const PIN_SET_KEY  = 'ptcg_pin_set'; // 是否已完成首次 PIN 設定
+const ROUND_PASS   = 8;
+const ROUND_TOTAL  = 10;
+
+const AVATARS = ['🐱','🐶','🐸','🐧','🦊','🐻','🐼','🐨','🦁','🐯','🦋','🌟','🌈','🎮','🎯','🚀','⚡','🔥','🌸','🍀'];
+
+const SUBJECTS = [
+  {id:'math',         name:'🔢 數學'},
+  {id:'chinese',      name:'📝 國語'},
+  {id:'english',      name:'🔤 英語'},
+  {id:'life',         name:'🌿 生活'},
+  {id:'nature',       name:'🔬 自然'},
+  {id:'taiwan',       name:'🇹🇼 台灣認識'},
+  {id:'taiwan_county',name:'📍 台灣縣市'},
+  {id:'flags',        name:'🏳️ 國旗認識'},
+  {id:'bopomofo',     name:'注 注音符號'},
+];
+
+// 生活表現項目（含分數）
+const LIFE_ITEMS = [
+  {id:'violin',   name:'複習小提琴',          pts:5,  icon:'🎻'},
+  {id:'bag',      name:'整理書包與餐袋',        pts:2,  icon:'🎒'},
+  {id:'english',  name:'學習英文',             pts:5,  icon:'🔤'},
+  {id:'diary',    name:'簽聯絡簿及分享學校事情', pts:2,  icon:'📒'},
+  {id:'toys',     name:'保持玩具歸位',          pts:2,  icon:'🧸'},
+  {id:'eat',      name:'專心吃飯營養均衡',       pts:2,  icon:'🍱'},
+  {id:'read',     name:'閱讀認證',             pts:5,  icon:'📚'},
+  {id:'bath',     name:'準時洗澡準備睡覺',       pts:2,  icon:'🛁'},
+  {id:'teeth',    name:'早晚有刷牙及用牙線',     pts:2,  icon:'🦷'},
+  {id:'nap',      name:'有睡午覺',             pts:2,  icon:'😴'},
+  {id:'chore',    name:'幫忙任何家事',          pts:2,  icon:'🏠'},
+  {id:'study',    name:'進行課後學習',          pts:2,  icon:'📖'},
+  {id:'special',  name:'特殊表現',             pts:10, icon:'⭐'},
+];
+
+// ════════════════════════════════════════
+// 題庫：小一～小二程度（無重複，每科30+題）
+// ════════════════════════════════════════
+const QUESTIONS = {
+  math:[
+    {q:'3 + 5 = ?',       opts:['8','7','9','6'],      ans:0},
+    {q:'10 - 4 = ?',      opts:['6','5','7','8'],      ans:0},
+    {q:'2 × 6 = ?',       opts:['12','10','14','8'],   ans:0},
+    {q:'15 ÷ 3 = ?',      opts:['5','4','6','3'],      ans:0},
+    {q:'7 + 8 = ?',       opts:['15','14','16','13'],  ans:0},
+    {q:'20 - 9 = ?',      opts:['11','10','12','9'],   ans:0},
+    {q:'4 × 5 = ?',       opts:['20','15','25','18'],  ans:0},
+    {q:'18 ÷ 2 = ?',      opts:['9','8','7','6'],      ans:0},
+    {q:'25 + 13 = ?',     opts:['38','37','39','36'],  ans:0},
+    {q:'50 - 23 = ?',     opts:['27','26','28','25'],  ans:0},
+    {q:'3 × 9 = ?',       opts:['27','24','30','21'],  ans:0},
+    {q:'24 ÷ 4 = ?',      opts:['6','5','7','8'],      ans:0},
+    {q:'一打有幾個？',     opts:['12','10','6','24'],   ans:0},
+    {q:'正方形有幾條邊？', opts:['4','3','5','6'],      ans:0},
+    {q:'5 + 9 = ?',       opts:['14','13','15','12'],  ans:0},
+    {q:'30 - 16 = ?',     opts:['14','13','15','12'],  ans:0},
+    {q:'6 × 4 = ?',       opts:['24','20','28','18'],  ans:0},
+    {q:'36 ÷ 6 = ?',      opts:['6','5','7','4'],      ans:0},
+    {q:'一星期有幾天？',   opts:['7','5','6','8'],      ans:0},
+    {q:'一小時有幾分鐘？', opts:['60','30','45','100'], ans:0},
+    {q:'45 + 36 = ?',     opts:['81','80','82','79'],  ans:0},
+    {q:'100 - 45 = ?',    opts:['55','54','56','65'],  ans:0},
+    {q:'7 × 3 = ?',       opts:['21','18','24','15'],  ans:0},
+    {q:'40 ÷ 8 = ?',      opts:['5','4','6','8'],      ans:0, explanation:'40除以8，想想8×5=40，所以答案是5。'},
+    {q:'三角形有幾個角？', opts:['3','4','2','5'],      ans:0, explanation:'三角形有3個角、3條邊，「三角」就是三個角的意思！'},
+    {q:'9 + 6 = ?',       opts:['15','14','16','13'],  ans:0, explanation:'9加6，可以想成9+1=10，再加5=15。'},
+    {q:'60 - 28 = ?',     opts:['32','31','33','30'],  ans:0, explanation:'60-28，先60-20=40，再40-8=32。'},
+    {q:'8 × 7 = ?',       opts:['56','48','63','54'],  ans:0, explanation:'8×7=56，背九九乘法表：八七五十六！'},
+    {q:'35 ÷ 5 = ?',      opts:['7','6','8','5'],      ans:0, explanation:'35÷5，想想5×7=35，所以答案是7。'},
+    {q:'半打有幾個？',     opts:['6','8','10','12'],    ans:0, explanation:'一打是12個，半打就是12÷2=6個。'},
+    {q:'圓形有幾個角？',   opts:['0個','1個','2個','無限多個'], ans:0, explanation:'圓形是曲線圍成的，沒有角也沒有邊，所以是0個角。'},
+    {q:'27 + 45 = ?',     opts:['72','71','73','70'],  ans:0, explanation:'27+45，先7+5=12，進位後2+4+1=7，答案72。'},
+    {q:'83 - 47 = ?',     opts:['36','35','37','38'],  ans:0, explanation:'83-47，借位計算：13-7=6，7-4=3，答案36。'},
+    {q:'6 × 8 = ?',       opts:['48','42','54','56'],  ans:0, explanation:'6×8=48，背九九乘法表：六八四十八！'},
+    {q:'45 ÷ 9 = ?',      opts:['5','4','6','7'],      ans:0, explanation:'45÷9=5，因為9×5=45。'},
+    {q:'一個月最多有幾天？', opts:['31天','30天','29天','28天'], ans:0, explanation:'1、3、5、7、8、10、12月有31天，是最多的。'},
+    {q:'4 × 4 = ?',       opts:['16','12','20','8'],   ans:0, explanation:'4×4=16，四四十六，背九九乘法表最容易記！'},
+    {q:'99 - 55 = ?',     opts:['44','45','43','54'],  ans:0, explanation:'99-55，個位9-5=4，十位9-5=4，答案44。'},
+    {q:'3 × 3 × 3 = ?',   opts:['27','9','18','81'],   ans:0, explanation:'3×3=9，9×3=27，三個3相乘等於27。'},
+    {q:'一公尺等於幾公分？', opts:['100公分','10公分','1000公分','50公分'], ans:0, explanation:'1公尺=100公分，就是100個1公分加在一起。'},
+    {q:'正方形和長方形都有幾個直角？', opts:['4個','2個','3個','0個'], ans:0, explanation:'正方形和長方形都有4個90度的直角，形狀很方正。'},
+    {q:'56 ÷ 7 = ?',      opts:['8','7','9','6'],      ans:0, explanation:'56÷7=8，因為7×8=56，九九乘法：七八五十六。'},
+    {q:'100以內最大的偶數是？', opts:['100','98','99','102'], ans:0, explanation:'偶數是2的倍數，100以內最大的偶數就是100本身。'},
+    {q:'5 + 5 + 5 + 5 = ?', opts:['20','15','25','10'], ans:0, explanation:'4個5相加=5×4=20，加法和乘法可以互換！'},
+  ],
+  chinese:[
+    {q:'「高興」的反義詞是？',           opts:['難過','快樂','生氣','害怕'],       ans:0},
+    {q:'「日」和「月」合成哪個字？',     opts:['明','晶','早','昌'],               ans:0},
+    {q:'「媽」的部首是？',               opts:['女','馬','口','人'],               ans:0},
+    {q:'「森林」的「森」有幾個木？',     opts:['3','2','4','1'],                   ans:0},
+    {q:'下面哪個是動詞？',               opts:['跑步','蘋果','美麗','快樂'],       ans:0},
+    {q:'「今天天氣很好。」句子的主詞是？', opts:['天氣','今天','很好','沒有主詞'],  ans:0},
+    {q:'「品」字由哪個字組成？',         opts:['口','品','山','田'],               ans:0},
+    {q:'「大」的反義詞是？',             opts:['小','多','長','高'],               ans:0},
+    {q:'「貓追老鼠」誰是主角？',         opts:['貓','老鼠','追','一起'],           ans:0},
+    {q:'下面哪個字部首是「氵」？',       opts:['海','草','空','石'],               ans:0},
+    {q:'「早上、中午、晚上」，早上的下一個是？', opts:['中午','晚上','下午','黃昏'], ans:0},
+    {q:'「春夏秋冬」共有幾個字？',       opts:['4','3','5','2'],                   ans:0},
+    {q:'「筆」的部首是？',               opts:['竹','毛','木','手'],               ans:0},
+    {q:'「開心」可以換成哪個詞？',       opts:['快樂','難過','緊張','生氣'],       ans:0},
+    {q:'「魚」的反義詞最接近的是？',     opts:['沒有反義詞','鳥','蟲','獸'],       ans:0},
+    {q:'逗號（，）用在哪裡？',           opts:['句子中間停頓','句子結束','引用話語','表驚嘆'], ans:0},
+    {q:'「花朵很美麗」，「美麗」是？',   opts:['形容詞','動詞','名詞','副詞'],     ans:0},
+    {q:'「車」的筆劃共幾劃？',           opts:['7','5','8','6'],                   ans:0},
+    {q:'下面哪個是名詞？',               opts:['桌子','跑','漂亮','慢慢'],         ans:0},
+    {q:'「晶」字有幾個「日」？',         opts:['3','2','4','1'],                   ans:0},
+    {q:'「快樂↔悲傷」這是什麼關係？',   opts:['反義詞','同義詞','相關詞','沒關係'], ans:0},
+    {q:'「書包」是幾個字？',             opts:['2','3','1','4'],                   ans:0},
+    {q:'「木」加「子」變成？',           opts:['李','林','杏','校'],               ans:0},
+    {q:'句子最後用什麼符號？',           opts:['句號（。）','逗號（，）','問號（？）','驚嘆號（！）'], ans:0},
+    {q:'「太陽、月亮」是哪類詞？',       opts:['名詞','動詞','形容詞','副詞'],     ans:0, explanation:'太陽、月亮是具體事物的名字，所以是名詞。'},
+    {q:'「跑」的部首是？',               opts:['足','走','人','口'],               ans:0, explanation:'跑字的部首是「足」（⻊），和腳、走路有關的字大多有足部。'},
+    {q:'「大家一起」，「一起」是？',     opts:['副詞','名詞','動詞','形容詞'],     ans:0, explanation:'「一起」修飾動詞，說明「怎麼做」，所以是副詞。'},
+    {q:'「山」字像什麼形狀？',           opts:['山的輪廓','三個點','三條線','三角形'], ans:0, explanation:'「山」是象形字，像遠處山峰的輪廓，中間高兩側低。'},
+    {q:'「哥哥比我高」，「高」是？',     opts:['形容詞','名詞','動詞','副詞'],     ans:0, explanation:'「高」描述哥哥的特徵，修飾名詞，所以是形容詞。'},
+    {q:'下面哪個字是左右結構？',         opts:['明','品','回','田'],               ans:0, explanation:'「明」由「日」和「月」左右組成，是典型的左右結構字。'},
+    {q:'「水」的偏旁（三點水）叫做？',  opts:['氵','水','冫','丶'],               ans:0, explanation:'三點水（氵）是「水」的偏旁，凡是和水有關的字大多有氵。'},
+    {q:'「公園裡有很多花。」這句話，「很多」修飾的是？', opts:['花','公園','有','裡'], ans:0, explanation:'「很多」是形容詞，描述花的數量多，所以修飾「花」。'},
+    {q:'標點符號「！」表示什麼？',       opts:['驚嘆或強調','句子結束','停頓','疑問'], ans:0, explanation:'驚嘆號（！）表示驚訝、強調或感嘆，語氣比句號強烈。'},
+    {q:'「早起的鳥兒有蟲吃」是什麼？',  opts:['諺語','詩','成語','歇後語'],       ans:0, explanation:'這是台灣常見的諺語，說明勤勞早起的人會有好機會。'},
+    {q:'「水」字有幾劃？',               opts:['4劃','3劃','5劃','6劃'],           ans:0, explanation:'水字共4劃：一撇、一橫折鉤、一撇、一撇。'},
+    {q:'「木」加「目」是哪個字？',       opts:['相','棵','桌','根'],               ans:0, explanation:'木加目組成「相」（ㄒㄧㄤ），如「互相」「相信」。'},
+    {q:'下面哪個是量詞？',               opts:['一隻貓的「隻」','跑步','美麗','快樂'], ans:0, explanation:'量詞用來計算數量，「隻」是計算動物的量詞，如一隻貓。'},
+    {q:'「笑口常開」是哪種語詞？',       opts:['成語','諺語','謎語','歇後語'],     ans:0, explanation:'「笑口常開」是四字成語，形容人常常面帶微笑、開心。'},
+    {q:'「人山人海」形容？',             opts:['人很多','山很高','海很廣','人很高'], ans:0, explanation:'人山人海是成語，形容人多得像山像海，聚集了很多人。'},
+    {q:'「木」的部首是？',               opts:['木','土','林','森'],               ans:0, explanation:'「木」本身就是部首，它是許多和樹木有關的字的部首。'},
+    {q:'「今天」是哪類詞？',             opts:['時間詞','人稱代名詞','動詞','形容詞'], ans:0, explanation:'「今天」表示時間，是時間詞的一種，也可以歸類為名詞。'},
+    {q:'標點符號「⋯⋯」（刪節號）表示什麼？', opts:['省略或停頓','句子結束','引用話語','疑問'], ans:0, explanation:'刪節號（⋯⋯）表示文字省略或說話停頓、猶豫。'},
+    {q:'「鳥」字的部首是？',             opts:['鳥','羽','飛','隹'],               ans:0, explanation:'「鳥」字本身就是部首，凡是鳥類相關的字大多用「鳥」部。'},
+    {q:'「白雪公主」是哪種文體？',       opts:['童話故事','說明文','詩歌','議論文'], ans:0, explanation:'白雪公主是充滿想像的童話故事，主角通常是王子、公主或動物。'},
+  ],
+  english:[
+    {q:'A, B, C, D 之後是哪個字母？',    opts:['E','F','G','H'],              ans:0},
+    {q:'「蘋果」的英文是？',             opts:['Apple','Orange','Banana','Grape'], ans:0},
+    {q:'「貓」的英文是？',               opts:['Cat','Dog','Bird','Fish'],    ans:0},
+    {q:'「紅色」的英文是？',             opts:['Red','Blue','Green','Yellow'], ans:0},
+    {q:'「一」的英文是？',               opts:['One','Two','Three','Four'],   ans:0},
+    {q:'「謝謝」的英文是？',             opts:['Thank you','Hello','Sorry','Goodbye'], ans:0},
+    {q:'「書」的英文是？',               opts:['Book','Pen','Bag','Chair'],   ans:0},
+    {q:'「太陽」的英文是？',             opts:['Sun','Moon','Star','Cloud'],  ans:0},
+    {q:'英文字母共有幾個？',             opts:['26','24','28','30'],          ans:0},
+    {q:'「狗」的英文是？',               opts:['Dog','Cat','Cow','Pig'],      ans:0},
+    {q:'「水」的英文是？',               opts:['Water','Milk','Juice','Tea'], ans:0},
+    {q:'「你好」的英文是？',             opts:['Hello','Bye','Sorry','Thanks'], ans:0},
+    {q:'「媽媽」的英文是？',             opts:['Mom','Dad','Sister','Brother'], ans:0},
+    {q:'「藍色」的英文是？',             opts:['Blue','Red','Green','Pink'],  ans:0},
+    {q:'「學校」的英文是？',             opts:['School','Home','Park','Shop'], ans:0},
+    {q:'「二」的英文是？',               opts:['Two','One','Three','Four'],   ans:0},
+    {q:'「鳥」的英文是？',               opts:['Bird','Fish','Frog','Bee'],   ans:0},
+    {q:'「大象」的英文是？',             opts:['Elephant','Tiger','Lion','Bear'], ans:0},
+    {q:'「白色」的英文是？',             opts:['White','Black','Gray','Brown'], ans:0},
+    {q:'「三」的英文是？',               opts:['Three','Two','Four','Five'],  ans:0},
+    {q:'「飯」的英文是？',               opts:['Rice','Bread','Noodle','Cake'], ans:0},
+    {q:'「爸爸」的英文是？',             opts:['Dad','Mom','Uncle','Grandpa'], ans:0},
+    {q:'「手」的英文是？',               opts:['Hand','Foot','Eye','Ear'],    ans:0},
+    {q:'「黃色」的英文是？',             opts:['Yellow','Orange','Purple','Pink'], ans:0},
+    {q:'「五」的英文是？',               opts:['Five','Four','Six','Seven'],  ans:0},
+    {q:'「球」的英文是？',               opts:['Ball','Toy','Doll','Car'],    ans:0},
+    {q:'「花」的英文是？',               opts:['Flower','Tree','Grass','Leaf'], ans:0, explanation:'Flower是花，Tree是樹，Grass是草，Leaf是葉子。'},
+    {q:'「再見」的英文是？',             opts:['Goodbye','Hello','Sorry','Please'], ans:0, explanation:'Goodbye是再見，Hello是你好，Sorry是對不起，Please是請。'},
+    {q:'「魚」的英文是？',               opts:['Fish','Frog','Crab','Snail'], ans:0, explanation:'Fish是魚，Frog是青蛙，Crab是螃蟹，Snail是蝸牛。'},
+    {q:'「綠色」的英文是？',             opts:['Green','Blue','Brown','Gray'], ans:0, explanation:'Green是綠色，Blue是藍色，Brown是棕色，Gray是灰色。'},
+    {q:'「老師」的英文是？',             opts:['Teacher','Doctor','Farmer','Cook'], ans:0, explanation:'Teacher是老師，Doctor是醫生，Farmer是農夫，Cook是廚師。'},
+    {q:'「大象」的英文是？',             opts:['Elephant','Tiger','Lion','Bear'], ans:0, explanation:'Elephant是大象，Tiger是老虎，Lion是獅子，Bear是熊。'},
+    {q:'「牛奶」的英文是？',             opts:['Milk','Water','Juice','Tea'], ans:0, explanation:'Milk是牛奶，Water是水，Juice是果汁，Tea是茶。'},
+    {q:'「十」的英文是？',               opts:['Ten','Seven','Eight','Nine'], ans:0, explanation:'Ten是10，Seven是7，Eight是8，Nine是9。'},
+    {q:'「早安」的英文是？',             opts:['Good morning','Good night','Good afternoon','Good evening'], ans:0, explanation:'Good morning是早安，Good night是晚安，Good afternoon是午安。'},
+    {q:'「學校」的英文是？',             opts:['School','Hospital','Library','Park'], ans:0, explanation:'School是學校，Hospital是醫院，Library是圖書館，Park是公園。'},
+    {q:'「下雨」的英文是？',             opts:['Rain','Snow','Wind','Cloud'], ans:0, explanation:'Rain是下雨，Snow是下雪，Wind是風，Cloud是雲。'},
+    {q:'「三」的英文是？',               opts:['Three','Five','Seven','Nine'], ans:0, explanation:'Three是3，Five是5，Seven是7，Nine是9。'},
+    {q:'「跑步」的英文是？',             opts:['Run','Jump','Swim','Fly'], ans:0, explanation:'Run是跑，Jump是跳，Swim是游泳，Fly是飛。'},
+    {q:'「台灣」的英文是？',             opts:['Taiwan','China','Japan','Korea'], ans:0, explanation:'Taiwan是台灣！我們美麗的家鄉在英文中叫做Taiwan。'},
+    {q:'「我愛你」的英文是？',           opts:['I love you','I like you','I miss you','I need you'], ans:0, explanation:'I love you是我愛你，是表達愛意最直接的英文說法！'},
+    {q:'「冰淇淋」的英文是？',           opts:['Ice cream','Cake','Cookie','Candy'], ans:0, explanation:'Ice cream是冰淇淋，冰(Ice)加上奶油(cream)！'},
+    {q:'顏色「橘色」的英文是？',         opts:['Orange','Pink','Purple','White'], ans:0, explanation:'Orange是橘色，也是橘子的英文，兩個都叫Orange！'},
+    {q:'「星期一」的英文是？',           opts:['Monday','Sunday','Tuesday','Wednesday'], ans:0, explanation:'Monday是星期一，Sunday是星期日，Tuesday是星期二。'},
+    {q:'「生日快樂」的英文是？',         opts:['Happy birthday','Happy new year','Merry Christmas','Happy holiday'], ans:0, explanation:'Happy birthday是生日快樂！Happy是快樂，birthday是生日。'},
+    {q:'「書包」的英文是？',             opts:['Backpack','Pencil','Ruler','Eraser'], ans:0, explanation:'Backpack是書包（背包），Pencil是鉛筆，Ruler是尺，Eraser是橡皮擦。'},
+    {q:'「月亮」的英文是？',             opts:['Moon','Sun','Star','Sky'], ans:0, explanation:'Moon是月亮，Sun是太陽，Star是星星，Sky是天空。'},
+  ],
+  life:[
+    {q:'紅燈亮時要怎麼辦？',             opts:['停下等待','快速通過','慢速通過','按喇叭'], ans:0},
+    {q:'垃圾應該放到哪裡？',             opts:['垃圾桶','地上','馬路邊','水溝'], ans:0},
+    {q:'洗手的正確時機是？',             opts:['飯前便後','只有飯後','隨時都不用','只睡前'], ans:0},
+    {q:'看書時眼睛和書本距離約？',        opts:['30公分','10公分','50公分','越近越好'], ans:0},
+    {q:'打噴嚏時要怎麼做？',             opts:['用手帕或手肘遮住','直接對人噴','摀住嘴不遮鼻','不用遮'], ans:0},
+    {q:'台灣的國花是？',                 opts:['梅花','玫瑰','菊花','蘭花'],    ans:0},
+    {q:'撥打火警電話要打幾號？',          opts:['119','110','112','118'],        ans:0},
+    {q:'撥打警察電話要打幾號？',          opts:['110','119','112','118'],        ans:0},
+    {q:'回收標誌是什麼形狀？',           opts:['三角箭頭循環','正方形','圓形','星形'], ans:0},
+    {q:'台灣面對哪個方向是太平洋？',      opts:['東邊','西邊','南邊','北邊'],    ans:0},
+    {q:'過馬路要走哪裡？',               opts:['斑馬線','任何地方','路中間','快速通過'], ans:0},
+    {q:'吃飯前要做什麼？',               opts:['洗手','先看電視','先玩玩具','先喝水'], ans:0},
+    {q:'台灣的首都是？',                 opts:['台北市','台中市','高雄市','桃園市'], ans:0},
+    {q:'不能對陌生人做什麼？',           opts:['跟陌生人走','打招呼','請問問題','說謝謝'], ans:0},
+    {q:'喝水最好喝什麼？',               opts:['白開水','汽水','果汁','可樂'],  ans:0},
+    {q:'每天至少要睡幾小時（小朋友）？', opts:['9-11小時','5小時','7小時','12小時以上'], ans:0},
+    {q:'節約用水，不應該做什麼？',        opts:['讓水龍頭一直流','洗手後關水','用洗米水澆花','縮短淋浴時間'], ans:0},
+    {q:'發現地震要躲在哪裡？',           opts:['桌子下，護頭頸','趕快跑出去','靠近窗戶','站角落'], ans:0},
+    {q:'颱風來時要？',                   opts:['待在室內，關好門窗','去海邊玩','繼續戶外活動','開窗通風'], ans:0},
+    {q:'垃圾分類，紙張要放到？',          opts:['紙類回收','廚餘','一般垃圾','有害廢棄物'], ans:0},
+    {q:'我們的身體最重要的器官之一是？', opts:['心臟','耳朵','鼻子','手'],      ans:0},
+    {q:'台灣四面環的是？',               opts:['海洋','山','沙漠','平原'],      ans:0},
+    {q:'上學時應該？',                   opts:['準時到校','遲到沒關係','不用去','每天遲到'], ans:0},
+    {q:'在圖書館裡應該？',               opts:['保持安靜','大聲說話','跑來跑去','吃東西'], ans:0},
+    {q:'台灣最高的山是？',               opts:['玉山','阿里山','合歡山','雪山'], ans:0},
+    {q:'每天吃飯要記得？',               opts:['均衡飲食','只吃肉','只吃蔬菜','吃甜食'], ans:0},
+    {q:'「謝謝」是表示？',               opts:['感謝','對不起','沒關係','你好'], ans:0},
+    {q:'牙齒要多久刷一次？',             opts:['早晚各一次','只有晚上','一週一次','不用刷'], ans:0},
+    {q:'台灣的國旗主要有哪些顏色？',     opts:['紅白藍','紅黃','藍綠','黃黑'],  ans:0, explanation:'中華民國國旗（青天白日滿地紅）有紅、白、藍三種顏色。'},
+    {q:'和朋友吵架後應該？',             opts:['說對不起，和好','繼續生氣','告訴老師要打他','不理他'], ans:0, explanation:'吵架後主動說對不起、和好，是成熟的表現，朋友才能長久。'},
+    {q:'在圖書館要注意什麼？',           opts:['保持安靜','大聲說話','奔跑','吃東西'], ans:0, explanation:'圖書館是大家閱讀的地方，要保持安靜，尊重其他讀者。'},
+    {q:'公共場所的電梯應該讓誰先出去？', opts:['電梯裡的人先出','外面的人先進','一起衝進去','不一定'], ans:0, explanation:'禮貌原則：先讓電梯裡的人出來，再進去，這樣大家都不會撞在一起。'},
+    {q:'發現有人受傷要怎麼辦？',         opts:['告訴大人或打119','自己處理','不管他','跑走'], ans:0, explanation:'緊急狀況要立刻告訴大人或撥打119求救，不要自己單獨處理。'},
+    {q:'節省電力，不應該做什麼？',        opts:['讓電視一直開著沒人看','離開時關燈','不用的電器插頭拔掉','少開冷氣'], ans:0, explanation:'沒人看的電視不應該開著，這樣會浪費電力，增加碳排放。'},
+    {q:'食物過期後應該怎麼辦？',          opts:['丟掉不能吃','吃掉沒關係','加熱再吃','先聞聞看'], ans:0, explanation:'過期食物可能滋生細菌，吃了會生病，一定要丟掉。'},
+    {q:'騎腳踏車要戴什麼安全裝備？',      opts:['安全帽','圍巾','手套','太陽眼鏡'], ans:0, explanation:'騎腳踏車最重要的是戴安全帽，保護頭部，預防意外受傷。'},
+    {q:'看電視或玩手機一次最多多久？',    opts:['30-60分鐘就要休息','越久越好','沒有限制','2小時沒關係'], ans:0, explanation:'長時間用眼睛看螢幕對視力不好，每30-60分鐘要讓眼睛休息一下。'},
+    {q:'廚餘（食物殘渣）要放到哪裡？',    opts:['廚餘桶','一般垃圾','紙類回收','玻璃回收'], ans:0, explanation:'廚餘可以堆肥變成有機肥料，要放到廚餘桶，分開處理。'},
+    {q:'遇到陌生人給糖果要怎麼做？',      opts:['不接受，告訴家人','謝謝接受','偷偷吃','帶走再說'], ans:0, explanation:'不認識的人給的食物不要接受，要保護自己的安全，並告訴家人。'},
+    {q:'台灣的交通工具「高鐵」最高速度約是？', opts:['300公里/小時','100公里/小時','200公里/小時','500公里/小時'], ans:0, explanation:'台灣高鐵最高時速約300公里，從台北到高雄只要90分鐘。'},
+    {q:'環保購物袋的好處是？',            opts:['減少塑膠垃圾','比較便宜','裝更多東西','更容易破'], ans:0, explanation:'使用環保購物袋可以減少一次性塑膠袋的使用，保護海洋和環境。'},
+    {q:'在公車或捷運上看到老人、孕婦，應該？', opts:['讓座','假裝睡著','看手機','快速離開'], ans:0, explanation:'博愛座是給需要的人坐的，看到老人、孕婦、身障者要主動讓座。'},
+    {q:'保護地球，可以怎麼做？',          opts:['節能減碳、垃圾分類','多開車','多用一次性餐具','多買東西'], ans:0, explanation:'節能減碳、垃圾分類、少用一次性用品，都是保護地球的好方法。'},
+    {q:'身體哪個器官控制我們的思考和記憶？', opts:['大腦','心臟','肺臟','胃'], ans:0, explanation:'大腦是我們思考、學習和記憶的中心，也控制全身的感覺和動作。'},
+    {q:'均衡飲食的「彩虹飲食」是指？',    opts:['多吃各種顏色的蔬果','只吃紅色食物','食物要加色素','只吃彩色糖果'], ans:0, explanation:'彩虹飲食是指多吃各種顏色的蔬菜水果，不同顏色含有不同的營養素。'},
+    {q:'台灣的環保標誌是什麼顏色？',      opts:['綠色','紅色','藍色','黃色'], ans:0, explanation:'台灣的環保標誌是綠色，象徵環境保護和永續發展。'},
+  ],
+  nature:[
+    {q:'植物需要什麼進行光合作用？',      opts:['陽光、水、空氣','只要水','只要陽光','土壤和肥料'], ans:0},
+    {q:'蝴蝶的幼蟲叫做？',               opts:['毛毛蟲','蚊子','蜜蜂','螞蟻'], ans:0},
+    {q:'水加熱到100度會變成？',          opts:['水蒸氣','冰','霧','雲'],        ans:0},
+    {q:'水冷卻到0度以下會變成？',        opts:['冰','水蒸氣','雨','霧'],        ans:0},
+    {q:'地球繞著誰旋轉？',               opts:['太陽','月亮','火星','木星'],    ans:0},
+    {q:'植物的葉子是什麼顏色（大多數）？', opts:['綠色','黃色','紅色','藍色'],  ans:0},
+    {q:'彩虹有幾種顏色？',               opts:['7','6','5','8'],               ans:0},
+    {q:'磁鐵的哪兩極會相吸？',           opts:['N極和S極','N極和N極','S極和S極','都不相吸'], ans:0},
+    {q:'空氣中最多的氣體是？',           opts:['氮氣','氧氣','二氧化碳','水蒸氣'], ans:0},
+    {q:'哺乳動物用什麼呼吸？',           opts:['肺','鰓','皮膚','氣孔'],        ans:0},
+    {q:'植物的根的功用是？',             opts:['吸水固定','光合作用','製造種子','輸送氧氣'], ans:0},
+    {q:'下面哪個是昆蟲？',               opts:['蝴蝶','蜘蛛','蚯蚓','蟹'],     ans:0},
+    {q:'月亮本身會發光嗎？',             opts:['不會，反射太陽光','會','有時候會','只在夜晚會'], ans:0},
+    {q:'太陽從哪個方向升起？',           opts:['東方','西方','南方','北方'],    ans:0},
+    {q:'一天有幾個小時？',               opts:['24','12','48','36'],           ans:0},
+    {q:'青蛙的幼年期是？',               opts:['蝌蚪','毛毛蟲','幼蟲','卵'],  ans:0},
+    {q:'下面哪個是植物？',               opts:['向日葵','老鷹','青蛙','蚯蚓'], ans:0},
+    {q:'我們呼吸吸入的是？',             opts:['氧氣','二氧化碳','氮氣','水蒸氣'], ans:0},
+    {q:'我們呼吸呼出的是？',             opts:['二氧化碳','氧氣','氮氣','水蒸氣'], ans:0},
+    {q:'春天之後是哪個季節？',           opts:['夏天','秋天','冬天','又是春天'], ans:0},
+    {q:'下雨後天空可能出現什麼？',       opts:['彩虹','閃電','雪','霧'],        ans:0},
+    {q:'鳥類有什麼特徵？',               opts:['有翅膀和羽毛','有四條腿','用鰓呼吸','是哺乳類'], ans:0},
+    {q:'魚用什麼呼吸？',                 opts:['鰓','肺','皮膚','鼻子'],        ans:0},
+    {q:'種子長成植物需要什麼？',         opts:['水、陽光、土壤','只要水','只要陽光','只要土壤'], ans:0},
+    {q:'以下哪個是可再生能源？',         opts:['太陽能','石油','煤炭','天然氣'], ans:0},
+    {q:'蜜蜂採的是？',                   opts:['花蜜','果實','葉子','根'],      ans:0},
+    {q:'冬天後面接的是哪個季節？',       opts:['春天','夏天','秋天','又是冬天'], ans:0, explanation:'四季順序是春→夏→秋→冬，冬天結束後又回到春天，循環不息。'},
+    {q:'身體哪個器官負責抽送血液？',     opts:['心臟','肺','腦','胃'],          ans:0, explanation:'心臟像幫浦一樣，不停跳動把血液送到全身各處，是生命的中心。'},
+    {q:'下面哪個動物是卵生？',           opts:['雞','狗','貓','牛'],            ans:0, explanation:'雞是卵生動物，生蛋孵化後代；狗貓牛都是胎生，直接生出小寶寶。'},
+    {q:'顯微鏡是用來？',                 opts:['觀察微小物體','遙望星星','照相','量溫度'], ans:0, explanation:'顯微鏡可以把微小的東西放大數百倍，讓我們看到細胞、細菌等。'},
+    {q:'植物的花朵主要功能是？',          opts:['吸引蜜蜂傳粉、繁殖','光合作用','吸收水分','儲存養分'], ans:0, explanation:'花朵靠顏色和香氣吸引蜜蜂、蝴蝶傳粉，幫助植物繁殖後代。'},
+    {q:'水的三態是？',                   opts:['液體、固體、氣體','液體、固體、電漿','只有液體和固體','液體、氣體、能量'], ans:0, explanation:'水可以是液體（水）、固體（冰）和氣體（水蒸氣），這三種狀態靠溫度變換。'},
+    {q:'地球是第幾顆行星？',              opts:['第三顆','第一顆','第二顆','第四顆'], ans:0, explanation:'從太陽由近到遠：水星、金星、地球（第三）、火星，地球是第三顆行星。'},
+    {q:'哪個動物是「昆蟲」？',            opts:['蜜蜂','蜘蛛','蚯蚓','海星'], ans:0, explanation:'昆蟲有六條腿和三個體節（頭、胸、腹），蜜蜂是昆蟲；蜘蛛有八條腿，不是昆蟲。'},
+    {q:'蟬（知了）在哪裡生活最久？',      opts:['在地下（幼蟲期）','在樹上','在水裡','在草叢'], ans:0, explanation:'蟬的幼蟲在地下生活數年，成蟲飛出地面後只活幾週，在樹上鳴叫。'},
+    {q:'植物進行光合作用需要的顏色是？',   opts:['陽光（白光）','紅光','藍光','綠光'], ans:0, explanation:'植物利用太陽光進行光合作用，葉子是綠色是因為反射了綠光。'},
+    {q:'哪個天氣現象會帶來閃電？',        opts:['打雷（雷雨）','下雪','起霧','刮風'], ans:0, explanation:'雷雨天氣時，雲中電荷放電形成閃電，同時發出轟隆的雷聲。'},
+    {q:'台灣最常見的天然災害是？',        opts:['颱風和地震','火山爆發','海嘯','龍捲風'], ans:0, explanation:'台灣每年有多個颱風侵台，又位於地震帶，颱風和地震是最常見的天災。'},
+    {q:'蜜蜂採蜜後會變成？',             opts:['蜂蜜','果凍','糖果','花粉'], ans:0, explanation:'蜜蜂把花蜜帶回蜂巢，經過釀造後變成蜂蜜，我們才能享用美味的蜂蜜！'},
+    {q:'魚有脊椎骨嗎？',                 opts:['有，是脊椎動物','沒有，是無脊椎動物','只有鯊魚有','只有熱帶魚有'], ans:0, explanation:'魚類是脊椎動物，有脊椎骨（魚骨），和人類、鳥類一樣屬於脊椎動物。'},
+    {q:'氧氣約佔空氣的幾分之幾？',        opts:['五分之一（約21%）','一半（50%）','三分之一','百分之一'], ans:0, explanation:'空氣中氮氣約78%，氧氣約21%，我們呼吸就是為了吸入這21%的氧氣。'},
+    {q:'光的速度是每秒多少公里？',        opts:['約30萬公里','約1000公里','約10萬公里','約100萬公里'], ans:0, explanation:'光速每秒約30萬公里，是宇宙中最快的速度！從太陽到地球只要8分鐘。'},
+    {q:'鳥類的體溫比人類高還是低？',      opts:['比人類高','比人類低','一樣','隨天氣改變'], ans:0, explanation:'鳥類體溫約40-42度，比人類的37度高，這讓牠們有更多能量飛翔。'},
+    {q:'植物的果實主要是為了？',          opts:['保護種子和幫助傳播','吸引敵人','進行光合作用','吸收水分'], ans:0, explanation:'果實包裹著種子，靠動物或風力幫忙傳播，讓植物繁殖到更遠的地方。'},
+    {q:'水在幾度時會沸騰（在正常氣壓下）？', opts:['100度','80度','90度','120度'], ans:0, explanation:'在一大氣壓下，水加熱到100度就會沸騰變成水蒸氣。'},
+    {q:'人體最大的器官是？',             opts:['皮膚','肺','心臟','肝臟'], ans:0, explanation:'皮膚是人體面積最大的器官，覆蓋全身，有保護、感覺和調節體溫的功能。'},
+  ],
+  taiwan:[
+    {q:'台灣位在亞洲的哪個部分？',       opts:['東亞','南亞','西亞','北亞'],    ans:0},
+    {q:'台灣的首都是？',                 opts:['台北市','台中市','高雄市','台南市'], ans:0},
+    {q:'台灣最高的山是？',               opts:['玉山','阿里山','合歡山','雪山'], ans:0},
+    {q:'台灣的國旗叫做？',               opts:['青天白日滿地紅','五星旗','楓葉旗','太陽旗'], ans:0},
+    {q:'台灣最長的河流是？',             opts:['濁水溪','淡水河','高屏溪','大甲溪'], ans:0},
+    {q:'台灣四面環的是？',               opts:['大海','山脈','沙漠','平原'],    ans:0},
+    {q:'台灣的國花是？',                 opts:['梅花','菊花','蘭花','玫瑰'],    ans:0},
+    {q:'台灣原住民族共有幾族（官方認定）？', opts:['16族','10族','20族','8族'],ans:0},
+    {q:'台灣最大的湖是？',               opts:['日月潭','澄清湖','鯉魚潭','虎頭埤'], ans:0},
+    {q:'台灣在哪個海的旁邊？',           opts:['太平洋','大西洋','印度洋','北冰洋'], ans:0},
+    {q:'台灣的國語是？',                 opts:['中文（普通話）','英文','日文','台語'], ans:0},
+    {q:'台灣的貨幣叫做？',               opts:['新台幣','人民幣','日圓','美元'], ans:0},
+    {q:'台灣哪個城市以夜市最有名？',     opts:['台南','台北','高雄','花蓮'],    ans:0},
+    {q:'台灣的傳統節日「中秋節」吃什麼？', opts:['月餅','粽子','湯圓','年糕'], ans:0},
+    {q:'端午節吃什麼？',                 opts:['粽子','月餅','湯圓','發糕'],    ans:0},
+    {q:'台灣最著名的自然景觀「太魯閣」在哪？', opts:['花蓮','台東','南投','宜蘭'], ans:0},
+    {q:'台灣的「故宮博物院」在哪個城市？', opts:['台北','台中','台南','新北'],  ans:0},
+    {q:'「阿里山」最著名的是什麼？',     opts:['日出雲海','溫泉','沙灘','夜市'], ans:0},
+    {q:'台灣的選舉，幾歲可以投票？',     opts:['18歲','20歲','16歲','25歲'],   ans:0},
+    {q:'台灣過年（農曆新年）時會做什麼？', opts:['貼春聯、領紅包','烤肉','放天燈','賞花燈'], ans:0},
+    {q:'台灣的「夜市文化」有什麼？',     opts:['各種小吃攤位','只有服裝店','只有遊樂設施','古董市集'], ans:0},
+    {q:'台灣哪個地方以溫泉聞名？',       opts:['烏來、北投','日月潭','玉山','澎湖'], ans:0},
+    {q:'台灣的「布袋戲」是哪種藝術？',   opts:['傳統偶戲','歌劇','舞蹈','音樂'], ans:0, explanation:'布袋戲是台灣傳統偶戲，用手操控布偶演出，雲林是重要發源地。'},
+    {q:'台灣位於北回歸線的哪邊（大部分）？', opts:['北邊','南邊','正好在上面','西邊'], ans:0, explanation:'北回歸線穿過嘉義，台灣大部分土地在北回歸線以北的亞熱帶。'},
+    {q:'台灣的農業著名特產「烏龍茶」產於？', opts:['阿里山、梨山','台北','高雄','花蓮'], ans:0, explanation:'台灣烏龍茶以阿里山、梨山高山茶最著名，香氣濃郁。'},
+    {q:'台灣「燈籠節（天燈）」最著名在哪？', opts:['平溪','鹿港','旗津','安平'], ans:0, explanation:'新北市平溪每年元宵節施放天燈，是台灣著名的文化活動。'},
+    {q:'台灣面積排名在世界是？',         opts:['中小型島嶼','非常大','最小之一','全球第一'], ans:0, explanation:'台灣面積約3.6萬平方公里，在世界島嶼中屬於中小型。'},
+    {q:'台灣「921大地震」發生在哪一年？', opts:['1999年','2001年','2010年','1995年'], ans:0, explanation:'921大地震於1999年9月21日發生，震央在南投，是台灣重大天災。'},
+    {q:'台灣的「媽祖」是哪方面的神明？', opts:['海洋守護神','農業神','戰神','雨神'], ans:0, explanation:'媽祖是台灣最重要的民間信仰，保佑漁民和海上安全。'},
+    {q:'台灣的「鳳梨酥」是哪種食物？',   opts:['伴手禮糕點','一種飲料','傳統服飾','民俗活動'], ans:0, explanation:'鳳梨酥是台灣最具代表性的伴手禮糕點，外皮酥脆、內餡甜蜜。'},
+    {q:'台灣哪個城市有著名的「燈會」？', opts:['台灣燈會各地輪辦','只有台北','只有台南','只有高雄'], ans:0, explanation:'台灣燈會每年元宵節由不同城市輪流舉辦，是全國性活動。'},
+    {q:'台灣的「故宮博物院」以什麼著名？', opts:['中華文物典藏','現代藝術','原住民文化','海洋生態'], ans:0, explanation:'台北故宮收藏近70萬件中華歷史文物，是世界級博物館。'},
+    {q:'台灣原住民族最多人口的族是？', opts:['阿美族','泰雅族','排灣族','布農族'], ans:0, explanation:'阿美族是台灣原住民族中人口最多的族群，主要分布在東部。'},
+    {q:'台灣「珍珠奶茶」發源自哪個城市？', opts:['台中','台北','台南','高雄'], ans:0, explanation:'珍珠奶茶（手搖飲）在1980年代發源自台中，現已風靡全球！'},
+    {q:'台灣每年農曆七月俗稱什麼月份？', opts:['鬼月','花月','豐收月','感恩月'], ans:0, explanation:'農曆七月是台灣傳統「鬼月」，民間有普渡祭祀的習俗。'},
+    {q:'台灣的「客家花布」最常見的圖案是？', opts:['大朵花卉','條紋','格子','素色'], ans:0, explanation:'客家花布以鮮豔的大朵花卉為特色，是客家文化的代表圖樣。'},
+    {q:'台灣「日月潭」位於哪個縣？', opts:['南投縣','台中市','嘉義縣','彰化縣'], ans:0, explanation:'日月潭位於南投縣魚池鄉，是台灣最大的天然湖泊。'},
+    {q:'台灣哪個節日要吃湯圓？', opts:['冬至','清明','端午','中秋'], ans:0, explanation:'冬至是台灣傳統節日，習俗是全家一起搓湯圓、吃湯圓，象徵團圓。'},
+    {q:'台灣「阿里山」最著名的景觀是？', opts:['日出雲海','溫泉','沙灘','湖泊'], ans:0, explanation:'阿里山以日出、雲海、森林鐵路和神木著名，是台灣重要觀光景點。'},
+    {q:'台灣哪條河流是最長的河流？', opts:['濁水溪','淡水河','高屏溪','大甲溪'], ans:0, explanation:'濁水溪全長約186公里，是台灣最長的河流，流經中部地區。'},
+  ],
+  taiwan_county:[
+    // 北部縣市
+    {q:'台北市最著名的高樓是？', opts:['台北101','台北小巨蛋','圓山飯店','信義廣場'], ans:0, explanation:'台北101高509公尺，曾是世界第一高樓，是台北最著名的地標。'},
+    {q:'新北市「九份」以什麼著名？', opts:['山城老街與茶館','溫泉','夜市','漁港'], ans:0, explanation:'九份是昔日淘金小鎮，現以山城老街、茶館和夜景著名，也是《千與千尋》靈感來源之一。'},
+    {q:'基隆市最著名的小吃街是？', opts:['廟口夜市','逢甲夜市','六合夜市','士林夜市'], ans:0, explanation:'基隆廟口夜市緊鄰奠濟宮，是台灣最具特色的海港城市小吃聚集地。'},
+    {q:'桃園市因哪個設施而重要？', opts:['台灣桃園國際機場','台灣高鐵起點','最大漁港','最大水庫'], ans:0, explanation:'桃園國際機場是台灣最主要的國際航空門戶，連接世界各地。'},
+    {q:'新竹市最著名的科技園區叫做？', opts:['新竹科學園區','台南科技園區','南港軟體園區','內湖科技園區'], ans:0, explanation:'新竹科學工業園區有台積電、聯發科等公司，是台灣科技產業核心。'},
+    {q:'苗栗縣「三義」以什麼工藝著名？', opts:['木雕','陶瓷','玻璃','布藝'], ans:0, explanation:'三義是台灣木雕藝術重鎮，街道兩旁都是木雕藝品店，非常有特色。'},
+    {q:'苗栗縣哪個景點有自然休閒農業體驗？', opts:['卓也小屋','南庄老街','通霄神社','獅潭仙山'], ans:0, explanation:'卓也小屋位於三義，結合藍染工藝、自然農業和休閒住宿，是苗栗特色景點。'},
+    // 中部縣市
+    {q:'台中市哪個夜市是台灣最大夜市之一？', opts:['逢甲夜市','士林夜市','六合夜市','廟口夜市'], ans:0, explanation:'逢甲夜市位於台中，是台灣人流量最大的觀光夜市之一，小吃種類繁多。'},
+    {q:'台中市哪個景點以老眼科建築著名？', opts:['宮原眼科','審計新村','東海大學','秋紅谷'], ans:0, explanation:'宮原眼科是台中著名甜點店，建築保留日治時代眼科醫院特色，非常有特色。'},
+    {q:'彰化縣「鹿港」以什麼著名？', opts:['古蹟與傳統文化','現代科技','漁業','茶葉'], ans:0, explanation:'鹿港是台灣保存最好的古城之一，有天后宮、龍山寺等古蹟，傳統工藝豐富。'},
+    {q:'彰化縣有什麼著名的大型佛像景點？', opts:['八卦山大佛','中台禪寺','佛光山','慈濟靜思堂'], ans:0, explanation:'八卦山大佛高22公尺，是彰化最著名的地標，可以俯瞰整個彰化平原。'},
+    {q:'南投縣「日月潭」以哪個活動聞名？', opts:['泳渡日月潭','騎馬','攀岩','衝浪'], ans:0, explanation:'每年9月的泳渡日月潭活動有數萬人參加，是台灣最大的水上活動盛事。'},
+    {q:'南投縣玉山高度約幾公尺？', opts:['3952公尺','3000公尺','4000公尺','2500公尺'], ans:0, explanation:'玉山海拔3952公尺，是台灣和東北亞最高的山峰，也是台灣的聖山。'},
+    {q:'雲林縣「北港」以什麼著名？', opts:['媽祖廟朝天宮','客家文化','原住民族藝術','蘭花種植'], ans:0, explanation:'北港朝天宮是全台最重要的媽祖廟之一，每年媽祖遶境吸引數十萬信徒。'},
+    // 南部縣市
+    {q:'台南市「赤崁樓」是哪個時代建造的？', opts:['荷蘭時代','清朝','日治時代','民國'], ans:0, explanation:'赤崁樓建於1653年荷蘭統治時期，是台灣最重要的歷史古蹟之一。'},
+    {q:'台南市以什麼著名？', opts:['美食古都','科技重鎮','漁業大縣','茶葉產地'], ans:0, explanation:'台南是台灣歷史最悠久的城市，美食文化豐富，有擔仔麵、棺材板等著名小吃。'},
+    {q:'高雄市「愛河」有什麼特色？', opts:['夜間遊船賞景','溫泉泡湯','漂流木藝術','螢火蟲生態'], ans:0, explanation:'愛河夜間遊船是高雄著名的浪漫活動，兩岸燈光與水面倒影非常美麗。'},
+    {q:'屏東縣「墾丁」以什麼著名？', opts:['海灘與珊瑚礁','高山茶','傳統廟宇','木雕藝術'], ans:0, explanation:'墾丁國家公園是台灣第一個國家公園，有美麗的海灘、珊瑚礁和熱帶風情。'},
+    {q:'屏東縣「東港」最著名的海鮮是？', opts:['黑鮪魚','龍蝦','烏魚子','石斑魚'], ans:0, explanation:'東港黑鮪魚季每年五、六月舉辦，新鮮的黑鮪魚是東港最著名的特產。'},
+    // 東部縣市
+    {q:'花蓮縣「太魯閣」以什麼地形著名？', opts:['大理石峽谷','火山地形','沙漠','冰河遺跡'], ans:0, explanation:'太魯閣峽谷由大理石和花崗岩構成，立霧溪侵蝕出壯麗的峽谷，是世界級景觀。'},
+    {q:'台東縣「蘭嶼」是哪個原住民族的家鄉？', opts:['達悟族（雅美族）','阿美族','排灣族','布農族'], ans:0, explanation:'蘭嶼是達悟族（雅美族）的聖地，保有傳統拼板舟文化和飛魚祭等習俗。'},
+    {q:'宜蘭縣「礁溪」以什麼著名？', opts:['溫泉','夜市','漁港','古蹟'], ans:0, explanation:'礁溪溫泉是台灣少見的平地溫泉，泉質清澈，是宜蘭最著名的觀光景點。'},
+    {q:'宜蘭縣「羅東」最著名的是什麼？', opts:['羅東夜市','傳統廟宇','原住民博物館','玻璃工藝'], ans:0, explanation:'羅東夜市是宜蘭最熱鬧的夜市，有卜肉、鴨賞等宜蘭特色小吃。'},
+    // 離島
+    {q:'澎湖縣以什麼地質景觀著名？', opts:['玄武岩柱狀節理','石灰岩洞','砂岩地形','火山岩'], ans:0, explanation:'澎湖的玄武岩柱狀節理是全球少見的自然奇景，已列為自然保護區。'},
+    {q:'金門縣最著名的特產是什麼酒？', opts:['高粱酒','紹興酒','米酒','葡萄酒'], ans:0, explanation:'金門高粱酒以金門特產高粱釀製，是台灣最著名的烈酒，行銷全球。'},
+    {q:'馬祖的「藍眼淚」是什麼現象？', opts:['夜光蟲發光','螢火蟲','極光','水母發光'], ans:0, explanation:'馬祖藍眼淚是由海洋夜光蟲（腰鞭毛藻）聚集發出的藍色螢光，是珍貴的自然奇景。'},
+    // 綜合地理
+    {q:'台灣哪個縣市面積最大？', opts:['花蓮縣','南投縣','台東縣','高雄市'], ans:0, explanation:'花蓮縣面積約4628平方公里，是台灣面積最大的縣市。'},
+    {q:'台灣哪個直轄市人口最多？', opts:['新北市','台北市','台中市','高雄市'], ans:0, explanation:'新北市人口約400萬，是台灣人口最多的直轄市，環繞台北市四周。'},
+    {q:'台灣哪個縣市是唯一不靠海的縣？', opts:['南投縣','嘉義縣','苗栗縣','彰化縣'], ans:0, explanation:'南投縣位於台灣中部內陸，是台灣唯一一個完全不靠海的縣。'},
+    {q:'「客家庄」在台灣主要分布在哪些縣市？', opts:['桃園、新竹、苗栗','台北、基隆、宜蘭','台南、高雄、屏東','花蓮、台東、澎湖'], ans:0, explanation:'北台灣的桃園、新竹、苗栗是台灣客家人最集中的地區，保有豐富客家文化。'},
+  ],
+  bopomofo:[
+    // 聲母認識
+    {q:'注音符號「ㄅ」的發音像哪個字的開頭？', opts:['爸','媽','大','你'], ans:0, explanation:'ㄅ是雙唇音，發音像「爸」（ㄅㄚˋ）的開頭聲母。'},
+    {q:'注音符號「ㄇ」的發音像哪個字的開頭？', opts:['媽','爸','大','他'], ans:0, explanation:'ㄇ是雙唇鼻音，發音像「媽」（ㄇㄚ）的開頭聲母。'},
+    {q:'注音符號「ㄉ」的發音像哪個字的開頭？', opts:['大','小','貓','狗'], ans:0, explanation:'ㄉ是舌尖音，發音像「大」（ㄉㄚˋ）的開頭聲母。'},
+    {q:'注音符號「ㄋ」的發音像哪個字的開頭？', opts:['你','我','他','她'], ans:0, explanation:'ㄋ是舌尖鼻音，發音像「你」（ㄋㄧˇ）的開頭聲母。'},
+    {q:'注音符號「ㄍ」的發音像哪個字的開頭？', opts:['哥','弟','妹','姐'], ans:0, explanation:'ㄍ是舌根音，發音像「哥」（ㄍㄜ）的開頭聲母。'},
+    {q:'注音符號「ㄒ」的發音像哪個字的開頭？', opts:['小','大','中','長'], ans:0, explanation:'ㄒ是舌面音，發音像「小」（ㄒㄧㄠˇ）的開頭聲母。'},
+    // 韻母認識
+    {q:'注音「ㄚ」是什麼韻母？', opts:['開口音，像「啊」','閉口音','鼻音韻母','複韻母'], ans:0, explanation:'ㄚ是最基本的開口韻母，發音像「啊」，張嘴發出。'},
+    {q:'注音「ㄛ」唸起來像哪個音？', opts:['喔','啊','呀','耶'], ans:0, explanation:'ㄛ是圓唇韻母，發音像「喔」，嘴巴呈圓形發出。'},
+    {q:'注音「ㄟ」是哪種韻母？', opts:['複韻母','單韻母','聲母','聲調'], ans:0, explanation:'ㄟ是複韻母（由兩個音結合），發音像注音字「欸」。'},
+    {q:'注音「ㄤ」是哪種韻母？', opts:['鼻韻母','單韻母','複韻母','聲母'], ans:0, explanation:'ㄤ結尾有鼻音（ㄥ），所以是鼻韻母。'},
+    // 聲調
+    {q:'「ㄇㄚ」加上第一聲（ˉ）念起來是哪個字？', opts:['媽（媽媽）','馬','罵','麻'], ans:0, explanation:'第一聲是高平調，ㄇㄚ第一聲是「媽」，像媽媽的媽。'},
+    {q:'「ㄇㄚˇ」是第幾聲？', opts:['第三聲','第一聲','第二聲','第四聲'], ans:0, explanation:'ˇ這個符號代表第三聲（低降升調），ㄇㄚˇ是「馬」。'},
+    {q:'「ˊ」這個符號代表第幾聲？', opts:['第二聲','第一聲','第三聲','第四聲'], ans:0, explanation:'ˊ是第二聲（上揚調），像問別人「嗯？」的語調。'},
+    {q:'「ˋ」這個符號代表第幾聲？', opts:['第四聲','第一聲','第二聲','第三聲'], ans:0, explanation:'ˋ是第四聲（下降調），語調短促下降，像命令語氣。'},
+    {q:'注音共有幾個聲調（含輕聲）？', opts:['5個','4個','3個','6個'], ans:0, explanation:'注音有4個正式聲調加上輕聲，共5種聲調。'},
+    // 拼音練習
+    {q:'「ㄅ」+「ㄚ」= ？', opts:['爸（ㄅㄚˋ）','媽（ㄇㄚ）','打（ㄉㄚˇ）','拿（ㄋㄚˊ）'], ans:0, explanation:'ㄅ聲母加ㄚ韻母，第四聲念「爸」，是爸爸的爸。'},
+    {q:'「ㄇ」+「ㄧ」= ？', opts:['米（ㄇㄧˇ）','你（ㄋㄧˇ）','力（ㄌㄧˋ）','比（ㄅㄧˇ）'], ans:0, explanation:'ㄇ加ㄧ，第三聲是「米」，就是我們每天吃的白米飯！'},
+    {q:'「ㄋㄧˇ ㄏㄠˇ」是什麼意思？', opts:['你好','再見','謝謝','對不起'], ans:0, explanation:'ㄋㄧˇ是「你」，ㄏㄠˇ是「好」，合起來就是打招呼的「你好」！'},
+    {q:'「ㄒㄧㄝ ˙ ㄒㄧㄝ」是什麼意思？', opts:['謝謝','你好','再見','對不起'], ans:0, explanation:'ㄒㄧㄝˋ˙ㄒㄧㄝ是「謝謝」，輕聲說出，是感謝別人的用語。'},
+    {q:'注音符號「ㄓ」「ㄔ」「ㄕ」「ㄖ」屬於哪類聲母？', opts:['翹舌音','平舌音','唇齒音','舌根音'], ans:0, explanation:'ㄓㄔㄕㄖ發音時舌頭要向上翹，稱為翹舌音（捲舌音）。'},
+    {q:'注音符號「ㄗ」「ㄘ」「ㄙ」屬於哪類聲母？', opts:['平舌音','翹舌音','唇齒音','舌根音'], ans:0, explanation:'ㄗㄘㄙ發音時舌頭平放，稱為平舌音，和翹舌音要分清楚！'},
+    // 字音對應
+    {q:'「蘋果」的注音是？', opts:['ㄆㄧㄥˊ ㄍㄨㄛˇ','ㄅㄧㄥ ㄍㄛ','ㄆㄣ ㄍㄨ','ㄆㄧ ㄍㄨㄛ'], ans:0, explanation:'蘋（ㄆㄧㄥˊ）果（ㄍㄨㄛˇ），第二聲和第三聲，蘋果是很甜的水果！'},
+    {q:'「學校」的注音是？', opts:['ㄒㄩㄝˊ ㄒㄧㄠˋ','ㄒㄩ ㄒㄧ','ㄒㄩㄝ ㄒㄧ','ㄒㄩ ㄒㄧㄠ'], ans:0, explanation:'學（ㄒㄩㄝˊ）校（ㄒㄧㄠˋ），第二聲和第四聲，是我們去讀書的地方。'},
+    {q:'「台灣」的注音是？', opts:['ㄊㄞˊ ㄨㄢ','ㄊㄟ ㄨㄣ','ㄊㄚ ㄨㄟ','ㄊㄞ ㄨㄢˋ'], ans:0, explanation:'台（ㄊㄞˊ）灣（ㄨㄢ），台灣是我們美麗的家鄉！'},
+    {q:'「謝謝」的注音聲母是哪個？', opts:['ㄒ','ㄓ','ㄕ','ㄗ'], ans:0, explanation:'謝謝（ㄒㄧㄝˋ˙ㄒㄧㄝ）的聲母是ㄒ，是舌面音。'},
+    {q:'「老師」的注音是？', opts:['ㄌㄠˇ ㄕ','ㄌㄛ ㄙ','ㄌㄠ ㄒㄧ','ㄌㄡ ㄕ'], ans:0, explanation:'老（ㄌㄠˇ）師（ㄕ），師是輕聲，老師是教我們知識的人！'},
+    {q:'「寶可夢」的「寶」注音是？', opts:['ㄅㄠˇ','ㄅㄛˇ','ㄆㄠ','ㄅㄠˋ'], ans:0, explanation:'寶（ㄅㄠˇ）是第三聲，就是我們最喜歡的寶可夢的寶！'},
+    {q:'注音符號共有幾個聲母？', opts:['21個','26個','16個','37個'], ans:0, explanation:'注音符號共有21個聲母（ㄅㄆㄇㄈ…）、16個韻母，合計37個符號。'},
+    {q:'注音符號共有幾個韻母？', opts:['16個','21個','10個','26個'], ans:0, explanation:'注音符號有16個韻母，包含單韻母、複韻母和鼻韻母。'},
+    {q:'「ㄅ、ㄆ、ㄇ、ㄈ」這四個注音是哪類聲母？', opts:['唇音（雙唇/唇齒）','舌根音','翹舌音','舌面音'], ans:0, explanation:'ㄅㄆㄇ是雙唇音，ㄈ是唇齒音，這四個聲母都跟嘴唇有關！'},
+    {q:'輕聲在注音符號上怎麼表示？', opts:['不標聲調符號','加一個點','加橫線','加括號'], ans:0, explanation:'輕聲不加任何聲調符號，讀音短促而輕，例如「謝謝」的第二個「謝」。'},
+  ],
+};
+
+// 預設商店商品
+const DEFAULT_SHOP = [
+  {id:'s1', icon:'📺', name:'看一集卡通',     cost:20},
+  {id:'s2', icon:'🍦', name:'吃一支冰淇淋',    cost:30},
+  {id:'s3', icon:'🎮', name:'多玩30分鐘遊戲',  cost:40},
+  {id:'s4', icon:'🍕', name:'選一頓晚餐菜色',  cost:60},
+  {id:'s5', icon:'🧸', name:'買一樣小玩具',    cost:100},
+  {id:'s6', icon:'🎢', name:'去遊樂園玩',      cost:200},
+];
+
+// ════════════════════════════════════════
+// 全域狀態
+// ════════════════════════════════════════
+let S = {
+  profiles:[], currentId:null, parentPin:'2468',
+  cardPool:[], cardPoolLoaded:false,
+  pendingLife:[], shop:[],
+};
+let R = { // 回合狀態
+  subject:null, questions:[], currentIdx:0,
+  answers:[], changed:[], changeUsed:false,
+  pendingChange:false, correctCount:0,
+};
+
+function getProfile(id){ return S.profiles.find(p=>p.id===id); }
+function cur(){ return getProfile(S.currentId); }
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+
+// ════════════════════════════════════════
+// 儲存/載入
+// ════════════════════════════════════════
+function saveAll(){
+  localStorage.setItem(PROFILES_KEY, JSON.stringify(S.profiles));
+  localStorage.setItem(PIN_KEY, S.parentPin);
+  localStorage.setItem(LIFE_KEY, JSON.stringify(S.pendingLife));
+  localStorage.setItem(SHOP_KEY, JSON.stringify(S.shop));
+}
+function loadAll(){
+  S.parentPin   = localStorage.getItem(PIN_KEY)||'2468';
+  S.profiles    = JSON.parse(localStorage.getItem(PROFILES_KEY)||'[]');
+  S.pendingLife = JSON.parse(localStorage.getItem(LIFE_KEY)||'[]');
+  S.shop        = JSON.parse(localStorage.getItem(SHOP_KEY)||'null') || [...DEFAULT_SHOP];
+}
+function newProfile(name,avatar){
+  return {
+    id:Date.now().toString(), name, avatar,
+    collected:[], totalCorrect:0, totalRounds:0, drawCount:0,
+    subjectStats:{math:0,chinese:0,english:0,life:0,nature:0,taiwan:0,taiwan_county:0,flags:0,bopomofo:0},
+    badges:[], lifePoints:0, lifeLog:[], dailyDone:{},
+  };
+}
+
+// ════════════════════════════════════════
+// 伺服器 & 卡池
+// ════════════════════════════════════════
+async function checkServer(){
+  try{
+    const r=await fetch(`${SERVER}/api/cards?page=1`,{signal:AbortSignal.timeout(3000)});
+    if(r.ok){const d=await r.json();setStatus(true,`已連線 · ${d.total} 張卡`);return true;}
+  }catch(e){}
+  setStatus(false,'伺服器未連線');return false;
+}
+function setStatus(online,text){
+  document.querySelectorAll('.status-dot').forEach(d=>d.classList.toggle('online',online));
+  document.querySelectorAll('#statusText,#gameStatusText').forEach(el=>el.textContent=text);
+}
+async function loadCardPool(){
+  if(S.cardPoolLoaded) return;
+  try{
+    let all=[],page=1,total=Infinity;
+    while(all.length<total){
+      const r=await fetch(`${SERVER}/api/cards?page=${page}`);
+      const d=await r.json();
+      all=all.concat(d.cards);total=d.total;
+      if(page>=d.totalPages) break;page++;
+    }
+    S.cardPool=all;S.cardPoolLoaded=true;
+    updateCollStats();
+  }catch(e){console.warn('卡池載入失敗');}
+}
+function getUncollectedCard(){
+  const p=cur();if(!p||S.cardPool.length===0) return null;
+  const pool=S.cardPool.filter(c=>!p.collected.includes(c));
+  return pool.length?pool[Math.floor(Math.random()*pool.length)]:S.cardPool[Math.floor(Math.random()*S.cardPool.length)];
+}
+
+// ════════════════════════════════════════
+// 初始化
+// ════════════════════════════════════════
+window.onload=async function(){
+  loadAll();
+  // 首次啟動：尚未設定 PIN 碼，引導家長設定
+  if(!localStorage.getItem(PIN_SET_KEY)){
+    showFirstPinSetup();
+    return;
+  }
+  renderLogin();checkServer();loadCardPool();
+};
+
+// ════════════════════════════════════════
+// 首次 PIN 設定
+// ════════════════════════════════════════
+function showFirstPinSetup(){
+  // 動態建立首次設定畫面
+  const div=document.createElement('div');
+  div.id='firstPinScreen';
+  div.style.cssText='position:fixed;inset:0;z-index:500;background:linear-gradient(135deg,#0f0c29,#302b63);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:20px;';
+  div.innerHTML=`
+    <div style="font-size:64px">🔐</div>
+    <div style="font-size:24px;font-weight:900;text-align:center;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">首次啟動設定</div>
+    <div style="font-size:14px;color:var(--text2);text-align:center">請設定家長後台的 PIN 碼（4位數字）<br>小朋友不知道 PIN 碼就無法進入家長後台</div>
+    <input id="firstPinA" type="tel" maxlength="4"
+      style="background:rgba(255,255,255,.08);border:2px solid var(--border);border-radius:12px;padding:16px;color:var(--text);font-size:28px;text-align:center;letter-spacing:10px;width:100%;max-width:280px;font-family:inherit;"
+      placeholder="輸入 PIN 碼">
+    <input id="firstPinB" type="tel" maxlength="4"
+      style="background:rgba(255,255,255,.08);border:2px solid var(--border);border-radius:12px;padding:16px;color:var(--text);font-size:28px;text-align:center;letter-spacing:10px;width:100%;max-width:280px;font-family:inherit;"
+      placeholder="再次確認 PIN 碼">
+    <button onclick="confirmFirstPin()"
+      style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:30px;padding:16px 40px;font-size:16px;font-weight:700;color:#000;cursor:pointer;width:100%;max-width:280px;font-family:inherit;">
+      設定完成，開始遊戲！
+    </button>
+  `;
+  document.body.appendChild(div);
+}
+function confirmFirstPin(){
+  const a=document.getElementById('firstPinA').value.trim();
+  const b=document.getElementById('firstPinB').value.trim();
+  if(!/^\d{4}$/.test(a)){showToast('請輸入4位數字！',true);return;}
+  if(a!==b){showToast('兩次輸入不一致，請重新輸入！',true);return;}
+  S.parentPin=a;
+  localStorage.setItem(PIN_SET_KEY,'1');
+  saveAll();
+  document.getElementById('firstPinScreen').remove();
+  renderLogin();checkServer();loadCardPool();
+  showToast('PIN 碼設定完成！');
+}
+
+// ════════════════════════════════════════
+// 登入
+// ════════════════════════════════════════
+function renderLogin(){
+  document.getElementById('profileGrid').innerHTML=S.profiles.map(p=>
+    `<div class="profile-card" onclick="login('${p.id}')">
+      <div class="profile-avatar">${p.avatar}</div>
+      <div class="profile-name">${p.name}</div>
+      <div class="profile-stats">🃏${p.collected.length}張 ⭐${p.lifePoints||0}分</div>
+    </div>`
+  ).join('');
+}
+function login(id){
+  S.currentId=id;const p=cur();
+  document.getElementById('topUser').textContent=p.avatar+' '+p.name;
+  document.getElementById('topCollected').textContent='🃏 '+p.collected.length;
+  document.getElementById('topPts').textContent='⭐ '+(p.lifePoints||0)+'分';
+  document.getElementById('settingAvatar').textContent=p.avatar;
+  document.getElementById('settingName').textContent=p.name;
+  document.getElementById('settingTotal').textContent=p.totalCorrect;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='block';
+  renderSubjectTabs();showSubjectPicker();updateCollStats();
+}
+function logout(){
+  S.currentId=null;
+  document.getElementById('gameScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  renderLogin();
+}
+
+// ════════════════════════════════════════
+// 新增小朋友
+// ════════════════════════════════════════
+let selAvatar=AVATARS[0];
+function showAddProfile(){
+  selAvatar=AVATARS[0];
+  document.getElementById('avatarGrid').innerHTML=
+    AVATARS.map((a,i)=>`<div class="avatar-opt ${i===0?'selected':''}" onclick="selAv(this,'${a}')">${a}</div>`).join('');
+  document.getElementById('newProfileName').value='';
+  showModal('addProfileModal');
+}
+function selAv(el,av){document.querySelectorAll('.avatar-opt').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');selAvatar=av;}
+function addProfile(){
+  const name=document.getElementById('newProfileName').value.trim();
+  if(!name){showToast('請輸入名字！',true);return;}
+  S.profiles.push(newProfile(name,selAvatar));saveAll();
+  closeModal('addProfileModal');renderLogin();showToast(`歡迎 ${selAvatar} ${name}！`);
+}
+
+// ════════════════════════════════════════
+// 答題系統
+// ════════════════════════════════════════
+function renderSubjectTabs(){
+  document.getElementById('subjectTabs').innerHTML=SUBJECTS.map(s=>
+    `<div class="subject-tab ${R.subject===s.id?'active':''}" onclick="selectSubject('${s.id}')">${s.name}</div>`
+  ).join('');
+}
+function showSubjectPicker(){
+  document.getElementById('subjectPicker').style.display='block';
+  document.getElementById('quizArea').style.display='none';
+  document.getElementById('resultArea').style.display='none';
+}
+function selectSubject(id){R.subject=id;renderSubjectTabs();startRound();}
+
+function startRound(){
+  let pool;
+  if(R.subject==='flags'){
+    _flagQCache = generateFlagQuestions();
+    pool = [..._flagQCache];
+  } else {
+    pool=[...QUESTIONS[R.subject]];
+  }
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const qs=pool.slice(0,ROUND_TOTAL);
+  R.questions=qs.map(q=>{
+    const pairs=q.opts.map((o,i)=>({o,correct:i===q.ans}));
+    for(let i=pairs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pairs[i],pairs[j]]=[pairs[j],pairs[i]];}
+    return{...q,shuffled:pairs};
+  });
+  R.currentIdx=0;R.answers=new Array(ROUND_TOTAL).fill(null);
+  R.changed=new Array(ROUND_TOTAL).fill(false);
+  R.changeUsed=false;R.pendingChange=false;R.correctCount=0;
+  document.getElementById('subjectPicker').style.display='none';
+  document.getElementById('quizArea').style.display='block';
+  document.getElementById('resultArea').style.display='none';
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q=R.questions[R.currentIdx];
+  const subj=SUBJECTS.find(s=>s.id===R.subject);
+  document.getElementById('roundLabel').textContent=`第 ${R.currentIdx+1} / ${ROUND_TOTAL} 題`;
+  document.getElementById('roundScore').innerHTML=`答對：<b style="color:var(--green)">${R.correctCount}</b> / ${ROUND_TOTAL}`;
+  document.getElementById('qSubjectLabel').textContent=subj.name;
+  document.getElementById('qChangedBadge').style.display=R.changeUsed?'inline-block':'none';
+  const pct=R.currentIdx/ROUND_TOTAL*100;
+  const fill=document.getElementById('progressFill');
+  fill.style.width=pct+'%';fill.className='progress-fill'+(R.correctCount>=ROUND_PASS?' good':'');
+  document.getElementById('qDots').innerHTML=R.questions.map((_,i)=>{
+    let cls='q-dot';
+    if(i===R.currentIdx) cls+=' current';
+    else if(R.answers[i]===true&&R.changed[i]) cls+=' changed';
+    else if(R.answers[i]===true) cls+=' correct';
+    else if(R.answers[i]===false) cls+=' wrong';
+    return `<div class="${cls}">${i+1}</div>`;
+  }).join('');
+
+  // 國旗題目：在題目上方顯示國旗圖片
+  let flagImgHtml = '';
+  if(R.subject==='flags' && q.flagCode){
+    flagImgHtml = `<div class="flag-question-img"><img src="${flagUrl(q.flagCode)}" alt="國旗" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22100%22><rect width=%22160%22 height=%22100%22 fill=%22%23334155%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2224%22>🏳️</text></svg>'"></div>`;
+  }
+  document.getElementById('qText').innerHTML = flagImgHtml + q.q;
+
+  document.getElementById('optionsGrid').innerHTML=q.shuffled.map((p,i)=>
+    `<button class="opt-btn" id="opt${i}" onclick="answer(${i},${p.correct})">${p.o}</button>`
+  ).join('');
+  document.getElementById('btnNext').style.display='none';
+  document.getElementById('changeHint').classList.remove('show');
+  document.getElementById('explanationBox').style.display='none';
+  document.getElementById('explanationBox').innerHTML='';
+  R.pendingChange=false;
+}
+
+function answer(idx,isCorrect){
+  // ── 改答模式：等待玩家重新選擇 ──
+  if(R.pendingChange){
+    const btns=document.querySelectorAll('.opt-btn');
+    // 不能點已標錯或已標對的按鈕
+    if(btns[idx].classList.contains('wrong')||btns[idx].classList.contains('correct')) return;
+    // 清除改答狀態
+    btns.forEach(b=>b.classList.remove('changeable'));
+    R.changed[R.currentIdx]=true;
+    R.changeUsed=true;
+    R.pendingChange=false;
+    document.getElementById('changeHint').classList.remove('show');
+    document.getElementById('qChangedBadge').style.display='inline-block';
+    // 鎖定所有選項並標示對錯
+    lockOptions(idx,isCorrect);
+    recordAnswer(isCorrect);
+    return;
+  }
+
+  // ── 一般作答（尚未回答） ──
+  if(R.answers[R.currentIdx]!==null) return;
+
+  if(!isCorrect && !R.changeUsed){
+    // 答錯且尚有改答機會：只標記錯誤選項，其他保持可點
+    R.pendingChange=true;
+    document.getElementById('changeHint').classList.add('show');
+    const btns=document.querySelectorAll('.opt-btn');
+    btns[idx].classList.add('wrong'); // 標記這個是錯的
+    btns.forEach((b,i)=>{
+      if(i!==idx){
+        b.classList.add('changeable'); // 閃爍提示可點
+      }
+    });
+    return;
+  }
+
+  // 答對，或答錯但已沒有改答機會
+  lockOptions(idx,isCorrect);
+  recordAnswer(isCorrect);
+}
+
+function lockOptions(selectedIdx,isCorrect){
+  const q=R.questions[R.currentIdx];
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.classList.add('disabled');
+    b.classList.remove('changeable');
+    if(q.shuffled[i].correct) b.classList.add('correct');
+    else if(i===selectedIdx&&!isCorrect) b.classList.add('wrong');
+  });
+  // 顯示解析
+  const box=document.getElementById('explanationBox');
+  const correctOpt=q.shuffled.find(p=>p.correct);
+  const expl=q.explanation||'';
+  if(isCorrect){
+    box.innerHTML=`<div class="ex-correct">✅ 答對了！</div>${expl?`<div class="ex-text">💡 ${expl}</div>`:''}`;
+    box.style.background='rgba(16,185,129,.08)';
+    box.style.borderColor='rgba(16,185,129,.3)';
+  } else {
+    box.innerHTML=`<div class="ex-wrong">❌ 答錯了！正確答案是：${correctOpt?.o||''}</div>${expl?`<div class="ex-text">💡 ${expl}</div>`:''}`;
+    box.style.background='rgba(239,68,68,.08)';
+    box.style.borderColor='rgba(239,68,68,.3)';
+  }
+  box.style.display='block';
+}
+function recordAnswer(isCorrect){
+  R.answers[R.currentIdx]=isCorrect;
+  if(isCorrect) R.correctCount++;
+  document.getElementById('qDots').innerHTML=R.questions.map((_,i)=>{
+    let cls='q-dot';
+    const done=R.answers[i]!==null;
+    if(done&&R.answers[i]===true&&R.changed[i]) cls+=' changed';
+    else if(done&&R.answers[i]===true) cls+=' correct';
+    else if(done&&R.answers[i]===false) cls+=' wrong';
+    else if(i===R.currentIdx) cls+=' current';
+    return `<div class="${cls}">${i+1}</div>`;
+  }).join('');
+  document.getElementById('roundScore').innerHTML=`答對：<b style="color:var(--green)">${R.correctCount}</b> / ${ROUND_TOTAL}`;
+  if(R.currentIdx===ROUND_TOTAL-1){
+    document.getElementById('btnNext').style.display='none';
+    setTimeout(()=>showResult(),1200);
+  } else {
+    document.getElementById('btnNext').style.display='block';
+  }
+}
+function nextQuestion(){
+  if(R.pendingChange){R.pendingChange=false;document.getElementById('changeHint').classList.remove('show');recordAnswer(false);return;}
+  R.currentIdx++;renderQuestion();
+}
+
+// ════════════════════════════════════════
+// 結算
+// ════════════════════════════════════════
+function showResult(){
+  document.getElementById('quizArea').style.display='none';
+  document.getElementById('resultArea').style.display='block';
+  const pass=R.correctCount>=ROUND_PASS;
+  const p=cur();
+  p.totalRounds++;p.totalCorrect+=R.correctCount;
+  p.subjectStats[R.subject]=(p.subjectStats[R.subject]||0)+R.correctCount;
+  if(pass) p.drawCount++;
+  // 記錄日誌
+  p.lifeLog=p.lifeLog||[];
+  p.lifeLog.unshift({type:'quiz',date:new Date().toLocaleString('zh-TW'),subject:SUBJECTS.find(s=>s.id===R.subject).name,correct:R.correctCount,pass});
+  if(p.lifeLog.length>50) p.lifeLog=p.lifeLog.slice(0,50);
+  checkBadges(p);saveAll();
+  document.getElementById('resultEmoji').textContent=pass?'🎉':'😅';
+  document.getElementById('resultTitle').textContent=pass?'達標！可以抽卡！':'繼續加油！';
+  document.getElementById('resultSub').textContent=pass?`答對 ${R.correctCount} 題，超棒！`:`差一點！再試一次！（需答對 ${ROUND_PASS} 題）`;
+  document.getElementById('scoreBig').textContent=R.correctCount;
+  document.getElementById('scoreCircle').className='score-circle'+(pass?'':' fail');
+  document.getElementById('rCorrect').textContent=R.correctCount+' / '+ROUND_TOTAL;
+  document.getElementById('rChanged').textContent=R.changed.some(c=>c)?'✅ 使用 1 次':'未使用';
+  document.getElementById('rDraw').textContent=pass?'✅ 達標':'❌ 未達標';
+  document.getElementById('rCollected').textContent=p.collected.length+' 張';
+  document.getElementById('topScore') && (document.getElementById('topScore').textContent='⭐ '+p.totalCorrect);
+  const btnDraw=document.getElementById('btnDraw');
+  btnDraw.style.display=pass?'block':'none';
+  if(pass) btnDraw.disabled=false;
+}
+function startNewRound(){showSubjectPicker();}
+
+// ════════════════════════════════════════
+// 抽卡動畫
+// ════════════════════════════════════════
+let cardFlipped=false,pendingCard=null;
+function triggerDraw(){
+  document.getElementById('btnDraw').disabled=true;
+  pendingCard=getUncollectedCard();
+  if(!pendingCard){showToast('請確認伺服器連線後再試',true);return;}
+  cardFlipped=false;
+  document.getElementById('drawCardInner').classList.remove('flipped');
+  document.getElementById('drawCardImg').src='';
+  document.getElementById('drawHint').style.display='block';
+  document.getElementById('drawBtnNext').classList.remove('show');
+  document.getElementById('drawCardName').textContent='';
+  document.getElementById('drawScore').textContent=R.correctCount;
+  document.getElementById('drawOverlay').classList.add('show');
+  document.getElementById('drawCardImg').src=`${SERVER}/card/${encodeURIComponent(pendingCard)}`;
+}
+function flipCard(){
+  if(cardFlipped) return;cardFlipped=true;
+  document.getElementById('drawCardInner').classList.add('flipped');
+  document.getElementById('drawHint').style.display='none';
+  const name=pendingCard.replace(/\.[^.]+$/,'');
+  document.getElementById('drawCardName').textContent='✨ '+name+' 已收藏！';
+  const p=cur();
+  if(!p.collected.includes(pendingCard)){
+    p.collected.push(pendingCard);
+    p.lifeLog=p.lifeLog||[];
+    p.lifeLog.unshift({type:'card',date:new Date().toLocaleString('zh-TW'),card:name});
+    if(p.lifeLog.length>50) p.lifeLog=p.lifeLog.slice(0,50);
+    saveAll();
+    document.getElementById('topCollected').textContent='🃏 '+p.collected.length;
+    document.getElementById('rCollected').textContent=p.collected.length+' 張';
+  }
+  checkBadges(p);saveAll();
+  setTimeout(()=>document.getElementById('drawBtnNext').classList.add('show'),600);
+}
+function closeDrawAndContinue(){document.getElementById('drawOverlay').classList.remove('show');updateCollStats();}
+
+// ════════════════════════════════════════
+// 圖鑑
+// ════════════════════════════════════════
+function renderCollection(){
+  const p=cur();
+  document.getElementById('collectionLoading').style.display='none';
+  if(!p||p.collected.length===0){
+    document.getElementById('collectionGrid').innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="e">🃏</div><p>還沒有收藏<br>答對 ${ROUND_PASS} 題就能抽卡！</p></div>`;return;
+  }
+  document.getElementById('collectionGrid').innerHTML=p.collected.slice().reverse().map(f=>
+    `<div class="card-thumb" onclick="viewCard('${encodeURIComponent(f)}','${f.replace(/\.[^.]+$/,'')}')">
+      <img src="${SERVER}/card/${encodeURIComponent(f)}" loading="lazy" alt="${f}">
+    </div>`
+  ).join('');
+}
+function updateCollStats(){
+  const p=cur();if(!p) return;
+  const total=S.cardPool.length,col=p.collected.length;
+  document.getElementById('statCollected').textContent=col;
+  document.getElementById('statTotal').textContent=total||'?';
+  document.getElementById('statPct').textContent=total?(col/total*100).toFixed(2)+'%':'0.00%';
+}
+function viewCard(encoded,name){
+  const div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;';
+  div.innerHTML=`<img src="${SERVER}/card/${encoded}" style="max-width:88%;max-height:68vh;border-radius:16px;box-shadow:0 0 40px rgba(245,158,11,.5)">
+    <div style="color:var(--accent);font-size:15px;font-weight:700">${name}</div>
+    <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:10px 26px;color:#fff;font-size:15px;cursor:pointer">關閉</button>`;
+  document.body.appendChild(div);
+}
+
+// ════════════════════════════════════════
+// 生活表現系統
+// ════════════════════════════════════════
+function renderLifePage(){
+  const p=cur();if(!p) return;
+  if(!p.dailyDone) p.dailyDone={};
+  if(!p.lifeLog) p.lifeLog=[];
+  if(!p.lifePoints) p.lifePoints=0;
+  const today=todayKey();
+  const todayDone=p.dailyDone[today]||[];
+  // 計算今日分數
+  let dailyPts=0;
+  todayDone.forEach(id=>{const item=LIFE_ITEMS.find(i=>i.id===id);if(item) dailyPts+=item.pts;});
+  document.getElementById('dailyPts').textContent=dailyPts+' 分';
+  document.getElementById('totalPts').textContent=(p.lifePoints||0)+' 分';
+  // 打卡項目
+  document.getElementById('lifeItemList').innerHTML=LIFE_ITEMS.map(item=>{
+    const done=todayDone.includes(item.id);
+    return `<div class="life-item ${done?'done':''}" onclick="toggleLifeItem('${item.id}')">
+      <div style="font-size:22px">${item.icon}</div>
+      <div class="life-item-name">${item.name}</div>
+      <div class="life-item-pts">+${item.pts}分</div>
+      <div class="life-item-check">${done?'✅':'○'}</div>
+    </div>`;
+  }).join('');
+  // 商店
+  renderShop();
+  // 紀錄（最近10筆）
+  const logs=(p.lifeLog||[]).slice(0,10);
+  document.getElementById('lifeLogList').innerHTML=logs.length?logs.map(l=>`
+    <div class="log-item">
+      <div class="log-date">${l.date}</div>
+      <div class="log-content">${
+        l.type==='life'?`🌟 生活表現獲得 <b style="color:var(--accent)">${l.pts}分</b>（${l.items?.join('、')||''}）`:
+        l.type==='redeem'?`🛒 兌換「${l.item}」花費 <b style="color:var(--red)">-${l.cost}分</b>`:
+        l.type==='card'?`🃏 收藏卡片「${l.card}」`:
+        l.type==='quiz'?`✏️ ${l.subject}答對 ${l.correct}/10 題`:''
+      }</div>
+    </div>`).join(''):`<div class="empty-state"><div class="e">📋</div><p>還沒有紀錄</p></div>`;
+}
+function toggleLifeItem(id){
+  const p=cur();if(!p) return;
+  if(!p.dailyDone) p.dailyDone={};
+  const today=todayKey();
+  if(!p.dailyDone[today]) p.dailyDone[today]=[];
+  const idx=p.dailyDone[today].indexOf(id);
+  if(idx>=0) p.dailyDone[today].splice(idx,1);
+  else p.dailyDone[today].push(id);
+  saveAll();renderLifePage();
+}
+function submitDailyLife(){
+  const p=cur();if(!p) return;
+  const today=todayKey();
+  const todayDone=p.dailyDone?.[today]||[];
+  if(todayDone.length===0){showToast('請先勾選今日完成的項目！',true);return;}
+  // 加入待審
+  let pts=0;const names=[];
+  todayDone.forEach(id=>{const item=LIFE_ITEMS.find(i=>i.id===id);if(item){pts+=item.pts;names.push(item.icon+item.name);}});
+  S.pendingLife.push({profileId:S.currentId,type:'daily',date:today,items:todayDone,pts,names,status:'pending',time:Date.now()});
+  saveAll();showToast('已送出今日生活表現給家長審核！');
+}
+
+// ════════════════════════════════════════
+// 商店
+// ════════════════════════════════════════
+function renderShop(){
+  const p=cur();if(!p) return;
+  document.getElementById('shopList').innerHTML=S.shop.map(item=>`
+    <div class="shop-item">
+      <div class="shop-item-icon">${item.icon}</div>
+      <div class="shop-item-info">
+        <div class="shop-item-name">${item.name}</div>
+        <div class="shop-item-cost">需要 ${item.cost} 分</div>
+      </div>
+      <button class="shop-btn" ${(p.lifePoints||0)<item.cost?'disabled':''} onclick="redeemItem('${item.id}')">
+        ${(p.lifePoints||0)<item.cost?'點數不足':'兌換'}
+      </button>
+    </div>`).join('');
+}
+function redeemItem(id){
+  const p=cur();if(!p) return;
+  const item=S.shop.find(s=>s.id===id);
+  if(!item) return;
+  if((p.lifePoints||0)<item.cost){showToast('點數不足！',true);return;}
+  if(!confirm(`確定要用 ${item.cost} 分兌換「${item.name}」嗎？`)) return;
+  p.lifePoints-=item.cost;
+  p.lifeLog=p.lifeLog||[];
+  p.lifeLog.unshift({type:'redeem',date:new Date().toLocaleString('zh-TW'),item:item.name,cost:item.cost});
+  if(p.lifeLog.length>50) p.lifeLog=p.lifeLog.slice(0,50);
+  checkBadges(p);saveAll();
+  document.getElementById('topPts').textContent='⭐ '+(p.lifePoints||0)+'分';
+  showToast(`🎉 已兌換「${item.name}」！`);
+  renderLifePage();
+}
+
+// ════════════════════════════════════════
+// 家長後台
+// ════════════════════════════════════════
+let pinInput='';
+function showParentLogin(){
+  pinInput='';renderPinDots();
+  document.getElementById('pinPad').innerHTML=
+    ['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>
+      k===''?'<div></div>':`<div class="pin-key" onclick="pinPress('${k}')">${k}</div>`
+    ).join('');
+  showModal('parentPinModal');
+}
+function renderPinDots(){
+  document.getElementById('pinDots').innerHTML=[0,1,2,3].map(i=>`<div class="pin-dot ${i<pinInput.length?'filled':''}"></div>`).join('');
+}
+function pinPress(k){
+  if(k==='⌫') pinInput=pinInput.slice(0,-1);
+  else if(pinInput.length<4) pinInput+=k;
+  renderPinDots();
+  if(pinInput.length===4){
+    setTimeout(()=>{
+      if(pinInput===S.parentPin){closeModal('parentPinModal');openParent();}
+      else{showToast('PIN 碼錯誤！',true);pinInput='';renderPinDots();}
+    },200);
+  }
+}
+function openParent(){
+  document.getElementById('parentScreen').style.display='block';
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='none';
+  renderParentDashboard();
+}
+function closeParent(){
+  document.getElementById('parentScreen').style.display='none';
+  if(S.currentId) document.getElementById('gameScreen').style.display='block';
+  else{document.getElementById('loginScreen').style.display='flex';renderLogin();}
+}
+function renderParentDashboard(){
+  // 進度
+  document.getElementById('parentProgressList').innerHTML=S.profiles.map(p=>`
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="font-size:26px">${p.avatar}</div>
+        <div>
+          <div style="font-weight:700">${p.name}</div>
+          <div style="font-size:12px;color:var(--text2)">答對${p.totalCorrect}題 · 🃏${p.collected.length}張 · ⭐${p.lifePoints||0}分</div>
+        </div>
+      </div>
+      ${SUBJECTS.map(s=>`
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+          <div style="width:44px;font-size:11px;color:var(--text2)">${s.name.split(' ')[1]}</div>
+          <div style="flex:1;background:rgba(255,255,255,.06);border-radius:10px;height:5px;overflow:hidden">
+            <div style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:${Math.min((p.subjectStats[s.id]||0)/20*100,100)}%;border-radius:10px"></div>
+          </div>
+          <div style="width:26px;text-align:right;font-size:11px;color:var(--text2)">${p.subjectStats[s.id]||0}</div>
+        </div>`).join('')}
+    </div>`).join('')||'<div style="color:var(--text2);text-align:center;padding:18px">尚未新增小朋友</div>';
+
+  // 待審
+  const items=S.pendingLife.filter(l=>l.status==='pending');
+  document.getElementById('pendingList').innerHTML=items.map((l,i)=>`
+    <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:12px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+        <b>${S.profiles.find(p=>p.id===l.profileId)?.name||'?'} · ${new Date(l.time).toLocaleDateString('zh-TW')}</b>
+        <span style="font-size:13px;color:var(--accent)">+${l.pts}分</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">${l.names?.join('、')||l.category||''}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="approveLife(${i})">✅ 核准</button>
+        <button class="btn btn-secondary btn-sm" onclick="rejectLife(${i})">❌ 不核准</button>
+      </div>
+    </div>`).join('')||'<div style="color:var(--text2);text-align:center;padding:16px">沒有待審核項目</div>';
+
+  // 商品管理
+  document.getElementById('shopManageList').innerHTML=S.shop.map((item,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:22px">${item.icon}</div>
+      <div style="flex:1;font-size:14px">${item.name} <span style="color:var(--accent)">${item.cost}分</span></div>
+      <button onclick="removeShopItem(${i})" style="background:none;border:none;color:var(--red);font-size:18px;cursor:pointer">🗑</button>
+    </div>`).join('');
+}
+function approveLife(idx){
+  const items=S.pendingLife.filter(l=>l.status==='pending');
+  const l=items[idx];l.status='approved';
+  const p=getProfile(l.profileId);
+  if(p){
+    p.lifePoints=(p.lifePoints||0)+l.pts;
+    p.lifeLog=p.lifeLog||[];
+    p.lifeLog.unshift({type:'life',date:new Date().toLocaleString('zh-TW'),pts:l.pts,items:l.names});
+    if(p.lifeLog.length>50) p.lifeLog=p.lifeLog.slice(0,50);
+    checkBadges(p);
+  }
+  saveAll();renderParentDashboard();showToast(`已核准，加 ${l.pts} 分！`);
+}
+function rejectLife(idx){
+  S.pendingLife.filter(l=>l.status==='pending')[idx].status='rejected';
+  saveAll();renderParentDashboard();showToast('已不核准');
+}
+function changePin(){
+  const v=document.getElementById('newPinInput').value.trim();
+  if(!/^\d{4}$/.test(v)){showToast('請輸入4位數字！',true);return;}
+  S.parentPin=v;saveAll();showToast('PIN 碼已更新！');
+}
+
+// 商店管理
+function showAddShop(){showModal('addShopModal');}
+function addShopItem(){
+  const name=document.getElementById('shopItemName').value.trim();
+  const icon=document.getElementById('shopItemIcon').value.trim()||'🎁';
+  const cost=parseInt(document.getElementById('shopItemCost').value);
+  if(!name||!cost||cost<1){showToast('請填入完整資料！',true);return;}
+  S.shop.push({id:'s'+Date.now(),icon,name,cost});
+  saveAll();closeModal('addShopModal');renderParentDashboard();showToast('商品已新增！');
+}
+function removeShopItem(idx){
+  if(!confirm('確定刪除這個商品？')) return;
+  S.shop.splice(idx,1);saveAll();renderParentDashboard();showToast('已刪除');
+}
+
+// ════════════════════════════════════════
+// 成就系統（豐富版）
+// ════════════════════════════════════════
+const ACHIEVEMENTS=[
+  // 答題成就
+  {id:'a1',  icon:'🎉', name:'初心者',      desc:'累計答對第1題',          cond:p=>p.totalCorrect>=1},
+  {id:'a2',  icon:'📚', name:'認真學習',     desc:'累計答對20題',           cond:p=>p.totalCorrect>=20},
+  {id:'a3',  icon:'⭐', name:'勤奮學者',     desc:'累計答對50題',           cond:p=>p.totalCorrect>=50},
+  {id:'a4',  icon:'🔥', name:'答題達人',     desc:'累計答對100題',          cond:p=>p.totalCorrect>=100},
+  {id:'a5',  icon:'💫', name:'知識探索者',   desc:'累計答對200題',          cond:p=>p.totalCorrect>=200},
+  {id:'a6',  icon:'👑', name:'知識王者',     desc:'累計答對500題',          cond:p=>p.totalCorrect>=500},
+  {id:'a7',  icon:'🌈', name:'超級學霸',     desc:'累計答對1000題',         cond:p=>p.totalCorrect>=1000},
+  // 集卡成就
+  {id:'b1',  icon:'🃏', name:'集卡新手',     desc:'收藏第1張卡',            cond:p=>p.collected.length>=1},
+  {id:'b2',  icon:'🗂', name:'小小收藏家',   desc:'收藏10張卡',             cond:p=>p.collected.length>=10},
+  {id:'b3',  icon:'📖', name:'收藏家',       desc:'收藏50張卡',             cond:p=>p.collected.length>=50},
+  {id:'b4',  icon:'💎', name:'傳說收藏家',   desc:'收藏100張卡',            cond:p=>p.collected.length>=100},
+  {id:'b5',  icon:'🏅', name:'究極收藏家',   desc:'收藏500張卡',            cond:p=>p.collected.length>=500},
+  {id:'b6',  icon:'🌟', name:'神話收藏家',   desc:'收藏1000張卡',           cond:p=>p.collected.length>=1000},
+  // 回合成就
+  {id:'c1',  icon:'🎯', name:'全科出戰',     desc:'九科都各答過一回合',     cond:p=>Object.values(p.subjectStats).every(v=>v>0)},
+  {id:'c2',  icon:'🏆', name:'抽卡達人',     desc:'累計抽卡10次',           cond:p=>p.drawCount>=10},
+  {id:'c3',  icon:'💪', name:'超級抽卡王',   desc:'累計抽卡50次',           cond:p=>p.drawCount>=50},
+  // 生活成就
+  {id:'d1',  icon:'🌱', name:'好習慣起步',   desc:'生活表現累計10分',       cond:p=>(p.lifePoints||0)>=10},
+  {id:'d2',  icon:'🌿', name:'生活小達人',   desc:'生活表現累計50分',       cond:p=>(p.lifePoints||0)>=50},
+  {id:'d3',  icon:'🌳', name:'生活大冠軍',   desc:'生活表現累計200分',      cond:p=>(p.lifePoints||0)>=200},
+  {id:'d4',  icon:'🛒', name:'第一次兌換',   desc:'完成第一次點數兌換',     cond:p=>(p.lifeLog||[]).some(l=>l.type==='redeem')},
+  // 學科專精成就
+  {id:'e1',  icon:'🔤', name:'英語入門',     desc:'英語科答對20題',         cond:p=>(p.subjectStats.english||0)>=20},
+  {id:'e2',  icon:'🌍', name:'台灣通',       desc:'台灣認識科答對30題',     cond:p=>(p.subjectStats.taiwan||0)>=30},
+  {id:'e3',  icon:'注', name:'注音達人',     desc:'注音符號科答對30題',     cond:p=>(p.subjectStats.bopomofo||0)>=30},
+  {id:'e4',  icon:'注', name:'注音大師',     desc:'注音符號科答對80題',     cond:p=>(p.subjectStats.bopomofo||0)>=80},
+  {id:'e5',  icon:'🏳️', name:'國旗探索者',  desc:'國旗認識科答對20題',     cond:p=>(p.subjectStats.flags||0)>=20},
+  {id:'e6',  icon:'🏳️', name:'世界旅人',    desc:'國旗認識科答對60題',     cond:p=>(p.subjectStats.flags||0)>=60},
+  {id:'e7',  icon:'📍', name:'台灣地圖通',   desc:'台灣縣市科答對20題',     cond:p=>(p.subjectStats.taiwan_county||0)>=20},
+  {id:'e8',  icon:'📍', name:'縣市達人',     desc:'台灣縣市科答對50題',     cond:p=>(p.subjectStats.taiwan_county||0)>=50},
+  {id:'e9',  icon:'🔢', name:'數學小天才',   desc:'數學科答對50題',         cond:p=>(p.subjectStats.math||0)>=50},
+  {id:'e10', icon:'📝', name:'國語文豪',     desc:'國語科答對50題',         cond:p=>(p.subjectStats.chinese||0)>=50},
+  {id:'e11', icon:'🔬', name:'小小科學家',   desc:'自然科答對50題',         cond:p=>(p.subjectStats.nature||0)>=50},
+  {id:'e12', icon:'🌿', name:'生活智慧王',   desc:'生活科答對50題',         cond:p=>(p.subjectStats.life||0)>=50},
+  // 台灣通大成就
+  {id:'f1',  icon:'🇹🇼', name:'台灣小達人',  desc:'台灣認識＋縣市兩科合計答對100題', cond:p=>((p.subjectStats.taiwan||0)+(p.subjectStats.taiwan_county||0))>=100},
+  {id:'f2',  icon:'🗺️', name:'全台走透透',   desc:'台灣縣市科答對100題',    cond:p=>(p.subjectStats.taiwan_county||0)>=100},
+  {id:'f3',  icon:'🏆', name:'台灣之光',     desc:'台灣所有相關科目各答對50題以上', cond:p=>(p.subjectStats.taiwan||0)>=50&&(p.subjectStats.taiwan_county||0)>=50},
+];
+function checkBadges(p){
+  ACHIEVEMENTS.forEach(a=>{
+    if(a.cond(p)&&!p.badges.includes(a.id)){
+      p.badges.push(a.id);
+      setTimeout(()=>showToast('🏆 獲得成就：'+a.name),300);
+    }
+  });
+}
+function renderAchievePage(){
+  const p=cur();if(!p) return;
+  document.getElementById('achieveList').innerHTML=ACHIEVEMENTS.map(a=>{
+    const done=p.badges.includes(a.id);
+    return `<div class="achieve-item" style="opacity:${done?1:.3}">
+      <div class="achieve-icon">${a.icon}</div>
+      <div class="achieve-info">
+        <div class="achieve-name">${a.name}</div>
+        <div class="achieve-desc">${a.desc}</div>
+      </div>
+      ${done?'<div class="achieve-check">✅</div>':''}
+    </div>`;
+  }).join('');
+  document.getElementById('subjectStats').innerHTML=SUBJECTS.map(s=>
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <div style="width:52px;font-size:12px;color:var(--text2)">${s.name.split(' ')[1]}</div>
+      <div style="flex:1;background:rgba(255,255,255,.06);border-radius:10px;height:7px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:${Math.min((p.subjectStats[s.id]||0)/50*100,100)}%;border-radius:10px"></div>
+      </div>
+      <div style="width:34px;text-align:right;font-size:12px;color:var(--text2)">${p.subjectStats[s.id]||0}</div>
+    </div>`
+  ).join('');
+}
+
+// ════════════════════════════════════════
+// 國旗資料庫（台灣正體中文國名）
+// ════════════════════════════════════════
+const FLAG_DATA = [
+  // 亞洲
+  {code:'tw', name:'中華民國（台灣）', continent:'亞洲', capital:'台北'},
+  {code:'jp', name:'日本', continent:'亞洲', capital:'東京'},
+  {code:'kr', name:'大韓民國', continent:'亞洲', capital:'首爾'},
+  {code:'kp', name:'北韓', continent:'亞洲', capital:'平壤'},
+  {code:'cn', name:'中國', continent:'亞洲', capital:'北京'},
+  {code:'hk', name:'香港', continent:'亞洲', capital:'香港'},
+  {code:'mo', name:'澳門', continent:'亞洲', capital:'澳門'},
+  {code:'mn', name:'蒙古', continent:'亞洲', capital:'烏蘭巴托'},
+  {code:'vn', name:'越南', continent:'亞洲', capital:'河內'},
+  {code:'th', name:'泰國', continent:'亞洲', capital:'曼谷'},
+  {code:'la', name:'寮國', continent:'亞洲', capital:'永珍'},
+  {code:'kh', name:'柬埔寨', continent:'亞洲', capital:'金邊'},
+  {code:'mm', name:'緬甸', continent:'亞洲', capital:'奈比多'},
+  {code:'my', name:'馬來西亞', continent:'亞洲', capital:'吉隆坡'},
+  {code:'sg', name:'新加坡', continent:'亞洲', capital:'新加坡'},
+  {code:'id', name:'印尼', continent:'亞洲', capital:'雅加達'},
+  {code:'ph', name:'菲律賓', continent:'亞洲', capital:'馬尼拉'},
+  {code:'bn', name:'汶萊', continent:'亞洲', capital:'斯里巴加灣'},
+  {code:'tl', name:'東帝汶', continent:'亞洲', capital:'帝力'},
+  {code:'in', name:'印度', continent:'亞洲', capital:'新德里'},
+  {code:'pk', name:'巴基斯坦', continent:'亞洲', capital:'伊斯蘭馬巴德'},
+  {code:'bd', name:'孟加拉', continent:'亞洲', capital:'達卡'},
+  {code:'lk', name:'斯里蘭卡', continent:'亞洲', capital:'可倫坡'},
+  {code:'np', name:'尼泊爾', continent:'亞洲', capital:'加德滿都'},
+  {code:'bt', name:'不丹', continent:'亞洲', capital:'廷布'},
+  {code:'mv', name:'馬爾地夫', continent:'亞洲', capital:'馬列'},
+  {code:'af', name:'阿富汗', continent:'亞洲', capital:'喀布爾'},
+  {code:'ir', name:'伊朗', continent:'亞洲', capital:'德黑蘭'},
+  {code:'iq', name:'伊拉克', continent:'亞洲', capital:'巴格達'},
+  {code:'sy', name:'敘利亞', continent:'亞洲', capital:'大馬士革'},
+  {code:'lb', name:'黎巴嫩', continent:'亞洲', capital:'貝魯特'},
+  {code:'jo', name:'約旦', continent:'亞洲', capital:'安曼'},
+  {code:'il', name:'以色列', continent:'亞洲', capital:'耶路撒冷'},
+  {code:'ps', name:'巴勒斯坦', continent:'亞洲', capital:'拉馬拉'},
+  {code:'sa', name:'沙烏地阿拉伯', continent:'亞洲', capital:'利雅德'},
+  {code:'ae', name:'阿拉伯聯合大公國', continent:'亞洲', capital:'阿布達比'},
+  {code:'qa', name:'卡達', continent:'亞洲', capital:'多哈'},
+  {code:'kw', name:'科威特', continent:'亞洲', capital:'科威特市'},
+  {code:'bh', name:'巴林', continent:'亞洲', capital:'麥納馬'},
+  {code:'om', name:'阿曼', continent:'亞洲', capital:'馬斯喀特'},
+  {code:'ye', name:'葉門', continent:'亞洲', capital:'沙那'},
+  {code:'tr', name:'土耳其', continent:'亞洲', capital:'安卡拉'},
+  {code:'cy', name:'賽普勒斯', continent:'亞洲', capital:'尼科西亞'},
+  {code:'am', name:'亞美尼亞', continent:'亞洲', capital:'葉里溫'},
+  {code:'az', name:'亞塞拜然', continent:'亞洲', capital:'巴庫'},
+  {code:'ge', name:'喬治亞', continent:'亞洲', capital:'提比里斯'},
+  {code:'kz', name:'哈薩克', continent:'亞洲', capital:'阿斯塔納'},
+  {code:'uz', name:'烏茲別克', continent:'亞洲', capital:'塔什干'},
+  {code:'tm', name:'土庫曼', continent:'亞洲', capital:'阿什哈巴德'},
+  {code:'tj', name:'塔吉克', continent:'亞洲', capital:'杜尚別'},
+  {code:'kg', name:'吉爾吉斯', continent:'亞洲', capital:'比斯凱克'},
+  // 歐洲
+  {code:'gb', name:'英國', continent:'歐洲', capital:'倫敦'},
+  {code:'fr', name:'法國', continent:'歐洲', capital:'巴黎'},
+  {code:'de', name:'德國', continent:'歐洲', capital:'柏林'},
+  {code:'it', name:'義大利', continent:'歐洲', capital:'羅馬'},
+  {code:'es', name:'西班牙', continent:'歐洲', capital:'馬德里'},
+  {code:'pt', name:'葡萄牙', continent:'歐洲', capital:'里斯本'},
+  {code:'nl', name:'荷蘭', continent:'歐洲', capital:'阿姆斯特丹'},
+  {code:'be', name:'比利時', continent:'歐洲', capital:'布魯塞爾'},
+  {code:'lu', name:'盧森堡', continent:'歐洲', capital:'盧森堡市'},
+  {code:'ch', name:'瑞士', continent:'歐洲', capital:'伯恩'},
+  {code:'at', name:'奧地利', continent:'歐洲', capital:'維也納'},
+  {code:'se', name:'瑞典', continent:'歐洲', capital:'斯德哥爾摩'},
+  {code:'no', name:'挪威', continent:'歐洲', capital:'奧斯陸'},
+  {code:'dk', name:'丹麥', continent:'歐洲', capital:'哥本哈根'},
+  {code:'fi', name:'芬蘭', continent:'歐洲', capital:'赫爾辛基'},
+  {code:'is', name:'冰島', continent:'歐洲', capital:'雷克雅維克'},
+  {code:'ie', name:'愛爾蘭', continent:'歐洲', capital:'都柏林'},
+  {code:'pl', name:'波蘭', continent:'歐洲', capital:'華沙'},
+  {code:'cz', name:'捷克', continent:'歐洲', capital:'布拉格'},
+  {code:'sk', name:'斯洛伐克', continent:'歐洲', capital:'布拉提斯拉瓦'},
+  {code:'hu', name:'匈牙利', continent:'歐洲', capital:'布達佩斯'},
+  {code:'ro', name:'羅馬尼亞', continent:'歐洲', capital:'布加勒斯特'},
+  {code:'bg', name:'保加利亞', continent:'歐洲', capital:'索菲亞'},
+  {code:'gr', name:'希臘', continent:'歐洲', capital:'雅典'},
+  {code:'hr', name:'克羅埃西亞', continent:'歐洲', capital:'薩格勒布'},
+  {code:'si', name:'斯洛維尼亞', continent:'歐洲', capital:'盧布爾雅那'},
+  {code:'ba', name:'波士尼亞與赫塞哥維納', continent:'歐洲', capital:'塞拉耶佛'},
+  {code:'rs', name:'塞爾維亞', continent:'歐洲', capital:'貝爾格勒'},
+  {code:'me', name:'蒙特內哥羅', continent:'歐洲', capital:'波德戈里察'},
+  {code:'mk', name:'北馬其頓', continent:'歐洲', capital:'斯科普里'},
+  {code:'al', name:'阿爾巴尼亞', continent:'歐洲', capital:'地拉那'},
+  {code:'xk', name:'科索沃', continent:'歐洲', capital:'普里斯提納'},
+  {code:'lt', name:'立陶宛', continent:'歐洲', capital:'維爾紐斯'},
+  {code:'lv', name:'拉脫維亞', continent:'歐洲', capital:'里加'},
+  {code:'ee', name:'愛沙尼亞', continent:'歐洲', capital:'塔林'},
+  {code:'by', name:'白俄羅斯', continent:'歐洲', capital:'明斯克'},
+  {code:'ua', name:'烏克蘭', continent:'歐洲', capital:'基輔'},
+  {code:'md', name:'摩爾多瓦', continent:'歐洲', capital:'基希訥烏'},
+  {code:'ru', name:'俄羅斯', continent:'歐洲', capital:'莫斯科'},
+  {code:'mt', name:'馬爾他', continent:'歐洲', capital:'瓦萊塔'},
+  {code:'ad', name:'安道爾', continent:'歐洲', capital:'安道爾城'},
+  {code:'mc', name:'摩納哥', continent:'歐洲', capital:'摩納哥'},
+  {code:'sm', name:'聖馬利諾', continent:'歐洲', capital:'聖馬利諾'},
+  {code:'va', name:'梵蒂岡', continent:'歐洲', capital:'梵蒂岡城'},
+  {code:'li', name:'列支敦斯登', continent:'歐洲', capital:'瓦杜茲'},
+  {code:'fo', name:'法羅群島', continent:'歐洲', capital:'托爾斯港'},
+  // 美洲
+  {code:'us', name:'美國', continent:'美洲', capital:'華盛頓特區'},
+  {code:'ca', name:'加拿大', continent:'美洲', capital:'渥太華'},
+  {code:'mx', name:'墨西哥', continent:'美洲', capital:'墨西哥城'},
+  {code:'gt', name:'瓜地馬拉', continent:'美洲', capital:'瓜地馬拉市'},
+  {code:'bz', name:'貝里斯', continent:'美洲', capital:'貝爾墨潘'},
+  {code:'hn', name:'宏都拉斯', continent:'美洲', capital:'德古斯加巴'},
+  {code:'sv', name:'薩爾瓦多', continent:'美洲', capital:'聖薩爾瓦多'},
+  {code:'ni', name:'尼加拉瓜', continent:'美洲', capital:'馬拿瓜'},
+  {code:'cr', name:'哥斯大黎加', continent:'美洲', capital:'聖荷西'},
+  {code:'pa', name:'巴拿馬', continent:'美洲', capital:'巴拿馬城'},
+  {code:'cu', name:'古巴', continent:'美洲', capital:'哈瓦那'},
+  {code:'jm', name:'牙買加', continent:'美洲', capital:'金斯敦'},
+  {code:'ht', name:'海地', continent:'美洲', capital:'太子港'},
+  {code:'do', name:'多明尼加', continent:'美洲', capital:'聖多明哥'},
+  {code:'tt', name:'千里達及托巴哥', continent:'美洲', capital:'西班牙港'},
+  {code:'bb', name:'巴貝多', continent:'美洲', capital:'橋鎮'},
+  {code:'lc', name:'聖露西亞', continent:'美洲', capital:'卡斯翠'},
+  {code:'vc', name:'聖文森及格瑞那丁', continent:'美洲', capital:'金斯敦'},
+  {code:'gd', name:'格瑞那達', continent:'美洲', capital:'聖喬治'},
+  {code:'ag', name:'安地卡及巴布達', continent:'美洲', capital:'聖約翰斯'},
+  {code:'kn', name:'聖克里斯多福及尼維斯', continent:'美洲', capital:'巴斯特爾'},
+  {code:'dm', name:'多米尼克', continent:'美洲', capital:'羅索'},
+  {code:'bs', name:'巴哈馬', continent:'美洲', capital:'拿索'},
+  {code:'co', name:'哥倫比亞', continent:'美洲', capital:'波哥大'},
+  {code:'ve', name:'委內瑞拉', continent:'美洲', capital:'卡拉卡斯'},
+  {code:'gy', name:'蓋亞那', continent:'美洲', capital:'喬治敦'},
+  {code:'sr', name:'蘇利南', continent:'美洲', capital:'巴拉馬利博'},
+  {code:'br', name:'巴西', continent:'美洲', capital:'巴西利亞'},
+  {code:'ec', name:'厄瓜多', continent:'美洲', capital:'基多'},
+  {code:'pe', name:'秘魯', continent:'美洲', capital:'利馬'},
+  {code:'bo', name:'玻利維亞', continent:'美洲', capital:'蘇克雷'},
+  {code:'cl', name:'智利', continent:'美洲', capital:'聖地牙哥'},
+  {code:'ar', name:'阿根廷', continent:'美洲', capital:'布宜諾斯艾利斯'},
+  {code:'uy', name:'烏拉圭', continent:'美洲', capital:'蒙特維多'},
+  {code:'py', name:'巴拉圭', continent:'美洲', capital:'亞松森'},
+  // 非洲
+  {code:'ma', name:'摩洛哥', continent:'非洲', capital:'拉巴特'},
+  {code:'dz', name:'阿爾及利亞', continent:'非洲', capital:'阿爾及爾'},
+  {code:'tn', name:'突尼西亞', continent:'非洲', capital:'突尼斯'},
+  {code:'ly', name:'利比亞', continent:'非洲', capital:'的黎波里'},
+  {code:'eg', name:'埃及', continent:'非洲', capital:'開羅'},
+  {code:'sd', name:'蘇丹', continent:'非洲', capital:'喀土木'},
+  {code:'ss', name:'南蘇丹', continent:'非洲', capital:'朱巴'},
+  {code:'et', name:'衣索比亞', continent:'非洲', capital:'阿迪斯阿貝巴'},
+  {code:'er', name:'厄利垂亞', continent:'非洲', capital:'阿斯馬拉'},
+  {code:'dj', name:'吉布地', continent:'非洲', capital:'吉布地市'},
+  {code:'so', name:'索馬利亞', continent:'非洲', capital:'摩加迪休'},
+  {code:'ke', name:'肯亞', continent:'非洲', capital:'奈洛比'},
+  {code:'ug', name:'烏干達', continent:'非洲', capital:'坎帕拉'},
+  {code:'rw', name:'盧安達', continent:'非洲', capital:'吉佳利'},
+  {code:'bi', name:'蒲隆地', continent:'非洲', capital:'吉特加'},
+  {code:'tz', name:'坦尚尼亞', continent:'非洲', capital:'多多馬'},
+  {code:'mz', name:'莫三比克', continent:'非洲', capital:'馬普托'},
+  {code:'mw', name:'馬拉威', continent:'非洲', capital:'里朗威'},
+  {code:'zm', name:'尚比亞', continent:'非洲', capital:'盧薩卡'},
+  {code:'zw', name:'辛巴威', continent:'非洲', capital:'哈拉雷'},
+  {code:'bw', name:'波札那', continent:'非洲', capital:'嘉柏隆里'},
+  {code:'na', name:'納米比亞', continent:'非洲', capital:'溫得和克'},
+  {code:'za', name:'南非', continent:'非洲', capital:'普利托利亞'},
+  {code:'ls', name:'賴索托', continent:'非洲', capital:'馬塞盧'},
+  {code:'sz', name:'史瓦帝尼', continent:'非洲', capital:'姆巴巴內'},
+  {code:'mg', name:'馬達加斯加', continent:'非洲', capital:'安塔那那利佛'},
+  {code:'km', name:'葛摩', continent:'非洲', capital:'莫洛尼'},
+  {code:'sc', name:'塞席爾', continent:'非洲', capital:'維多利亞'},
+  {code:'mu', name:'模里西斯', continent:'非洲', capital:'路易港'},
+  {code:'ng', name:'奈及利亞', continent:'非洲', capital:'阿布賈'},
+  {code:'gh', name:'迦納', continent:'非洲', capital:'阿克拉'},
+  {code:'ci', name:'象牙海岸', continent:'非洲', capital:'阿必尚'},
+  {code:'lr', name:'賴比瑞亞', continent:'非洲', capital:'蒙羅維亞'},
+  {code:'sl', name:'獅子山', continent:'非洲', capital:'自由城'},
+  {code:'gn', name:'幾內亞', continent:'非洲', capital:'柯那克里'},
+  {code:'gw', name:'幾內亞比索', continent:'非洲', capital:'比索'},
+  {code:'sn', name:'塞內加爾', continent:'非洲', capital:'達卡'},
+  {code:'gm', name:'甘比亞', continent:'非洲', capital:'班竹'},
+  {code:'ml', name:'馬利', continent:'非洲', capital:'巴馬科'},
+  {code:'bf', name:'布吉納法索', continent:'非洲', capital:'瓦加杜古'},
+  {code:'ne', name:'尼日', continent:'非洲', capital:'尼亞美'},
+  {code:'mr', name:'茅利塔尼亞', continent:'非洲', capital:'努瓦克肖特'},
+  {code:'cv', name:'維德角', continent:'非洲', capital:'培亞'},
+  {code:'st', name:'聖多美普林西比', continent:'非洲', capital:'聖多美'},
+  {code:'cm', name:'喀麥隆', continent:'非洲', capital:'雅溫德'},
+  {code:'td', name:'查德', continent:'非洲', capital:'恩賈梅納'},
+  {code:'cf', name:'中非', continent:'非洲', capital:'班吉'},
+  {code:'ga', name:'加彭', continent:'非洲', capital:'自由市'},
+  {code:'gq', name:'赤道幾內亞', continent:'非洲', capital:'馬拉博'},
+  {code:'cg', name:'剛果共和國', continent:'非洲', capital:'布拉薩市'},
+  {code:'cd', name:'剛果民主共和國', continent:'非洲', capital:'金夏沙'},
+  {code:'ao', name:'安哥拉', continent:'非洲', capital:'羅安達'},
+  {code:'tg', name:'多哥', continent:'非洲', capital:'洛美'},
+  {code:'bj', name:'貝南', continent:'非洲', capital:'波多諾伏'},
+  {code:'eh', name:'西撒哈拉', continent:'非洲', capital:'阿尤恩'},
+  // 大洋洲
+  {code:'au', name:'澳洲', continent:'大洋洲', capital:'坎培拉'},
+  {code:'nz', name:'紐西蘭', continent:'大洋洲', capital:'威靈頓'},
+  {code:'pg', name:'巴布亞紐幾內亞', continent:'大洋洲', capital:'莫士比港'},
+  {code:'fj', name:'斐濟', continent:'大洋洲', capital:'蘇瓦'},
+  {code:'sb', name:'索羅門群島', continent:'大洋洲', capital:'荷尼阿拉'},
+  {code:'vu', name:'萬那杜', continent:'大洋洲', capital:'維拉港'},
+  {code:'ws', name:'薩摩亞', continent:'大洋洲', capital:'阿皮亞'},
+  {code:'to', name:'東加', continent:'大洋洲', capital:'努庫阿洛法'},
+  {code:'ki', name:'吉里巴斯', continent:'大洋洲', capital:'塔拉瓦'},
+  {code:'tv', name:'吐瓦魯', continent:'大洋洲', capital:'富納富提'},
+  {code:'nr', name:'諾魯', continent:'大洋洲', capital:'亞倫'},
+  {code:'pw', name:'帛琉', continent:'大洋洲', capital:'恩吉魯穆德'},
+  {code:'fm', name:'密克羅尼西亞', continent:'大洋洲', capital:'帕利基爾'},
+  {code:'mh', name:'馬紹爾群島', continent:'大洋洲', capital:'馬久羅'},
+  {code:'gl', name:'格陵蘭', continent:'大洋洲', capital:'努克'},
+];
+
+// 國旗圖片路徑（優先用本機，否則用線上）
+const FLAG_SERVER = window.location.origin;
+function flagUrl(code){
+  return `${FLAG_SERVER}/flags/${code}.png`;
+}
+
+// ════════════════════════════════════════
+// 台灣縣市資料庫
+// ════════════════════════════════════════
+const TAIWAN_REGIONS = [
+  {
+    region: '北部',
+    counties: [
+      {name:'台北市', icon:'🏙️', capital:'信義區', pop:'約250萬', features:['政治經濟中心','101大樓','故宮博物院','士林夜市','捷運四通八達'], food:['蚵仔煎','牛肉麵','鼎泰豐小籠包','士林大香腸'], note:'台灣首都，6個直轄市之一'},
+      {name:'新北市', icon:'🌆', capital:'板橋區', pop:'約400萬（最多人口）', features:['台灣人口最多的城市','九份老街','淡水漁人碼頭','平溪天燈','烏來溫泉'], food:['三峽金牛角','鶯歌陶瓷','淡水魚丸','深坑豆腐'], note:'環繞台北市，面積最廣'},
+      {name:'基隆市', icon:'⛵', capital:'仁愛區', pop:'約37萬', features:['北台灣重要港口','基隆廟口夜市','和平島','八斗子漁港','多雨城市'], food:['鼎邊趖','天婦羅','豬血糕','泡泡冰'], note:'雨都，台灣重要海港'},
+      {name:'桃園市', icon:'✈️', capital:'桃園區', pop:'約230萬', features:['台灣桃園國際機場','大溪老街','慈湖','石門水庫','客家文化重鎮'], food:['大溪豆乾','客家粄條','牛肉麵','仙草雞'], note:'航空門戶，客家文化重鎮'},
+      {name:'新竹市', icon:'💨', capital:'東區', pop:'約45萬', features:['科學園區（台灣矽谷）','玻璃工藝博物館','城隍廟','南寮漁港'], food:['新竹貢丸','米粉','柿餅','摃丸湯'], note:'科技重鎮，台灣風最強城市'},
+      {name:'新竹縣', icon:'🏔️', capital:'竹北市', pop:'約57萬', features:['客家文化發源地','司馬庫斯神木','內灣老街','尖石鄉原住民文化'], food:['客家粄條','薑絲炒大腸','仙草凍','橘子'], note:'客家鄉親聚集地'},
+    ]
+  },
+  {
+    region: '中部',
+    counties: [
+      {name:'苗栗縣', icon:'🎎', capital:'苗栗市', pop:'約55萬', features:['客家文化重鎮','三義木雕','南庄老街','通霄神社','卓也小屋'], food:['客家湯圓','草莓','梅子','薑餅'], note:'木雕藝術之鄉，客家文化'},
+      {name:'台中市', icon:'🌸', capital:'西屯區', pop:'約280萬', features:['宮原眼科','逢甲夜市','清境農場','武陵農場','彩虹眷村'], food:['太陽餅','奶油酥餅','大甲芋頭','珍珠奶茶（發源地）'], note:'台灣第二大城市'},
+      {name:'彰化縣', icon:'🐂', capital:'彰化市', pop:'約130萬', features:['彰化八卦山大佛','鹿港古鎮','扇形車庫','王功漁港'], food:['肉圓','貓鼠麵','爌肉飯','花壇茉莉花茶'], note:'鹿港古都，傳統文化豐富'},
+      {name:'南投縣', icon:'🏞️', capital:'南投市', pop:'約50萬', features:['日月潭','清境農場','溪頭妖怪村','奧萬大楓葉','玉山（台灣最高山）'], food:['紹興酒','筊白筍','香菇','高山茶'], note:'唯一不靠海的縣，玉山所在地'},
+      {name:'雲林縣', icon:'🌾', capital:'斗六市', pop:'約70萬', features:['劍湖山世界','台西漁港','北港朝天宮','古坑咖啡','布袋戲發源地'], food:['西螺醬油','古坑咖啡','虎尾糖廠冰棒','麥芽糖'], note:'農業縣，布袋戲文化重鎮'},
+    ]
+  },
+  {
+    region: '南部',
+    counties: [
+      {name:'嘉義市', icon:'🌲', capital:'西區', pop:'約27萬', features:['阿里山森林鐵路起點','嘉義公園','檜意森活村','噴水圓環'], food:['火雞肉飯','方塊酥','雞肉飯','豆花'], note:'阿里山門戶，火雞肉飯發源地'},
+      {name:'嘉義縣', icon:'🚂', capital:'太保市', pop:'約51萬', features:['阿里山','奮起湖','梅山太平雲梯','布袋港','東石漁港'], food:['竹筍','茶葉','芒果','養殖海鮮'], note:'阿里山日出雲海著名'},
+      {name:'台南市', icon:'🏛️', capital:'安平區', pop:'約190萬', features:['台灣歷史最悠久的城市','安平古堡','赤崁樓','億載金城','台江國家公園'], food:['擔仔麵','棺材板','蝦捲','芒果冰','虱目魚'], note:'文化古都，美食之城'},
+      {name:'高雄市', icon:'🚢', capital:'苓雅區', pop:'約280萬', features:['台灣最大港口','愛河','駁二藝術特區','壽山','旗津海岸'], food:['旗魚黑輪','木瓜牛奶','三鳳中街中藥','鹽埕區小吃'], note:'工業與港口城市'},
+      {name:'屏東縣', icon:'🌺', capital:'屏東市', pop:'約83萬', features:['墾丁國家公園','小琉球','霧台魯凱族文化','三地門原住民藝術','林邊蓮霧'], food:['萬巒豬腳','東港黑鮪魚','蓮霧','洋蔥'], note:'台灣最南縣，魯凱族排灣族'},
+    ]
+  },
+  {
+    region: '東部',
+    counties: [
+      {name:'宜蘭縣', icon:'🎪', capital:'宜蘭市', pop:'約46萬', features:['蘭陽博物館','冬山河親水公園','礁溪溫泉','羅東夜市','太平山'], food:['牛舌餅','鴨賞','卜肉','三星蔥'], note:'雪山隧道開通後觀光興盛'},
+      {name:'花蓮縣', icon:'🏔️', capital:'花蓮市', pop:'約33萬', features:['太魯閣國家公園','清水斷崖','壽豐雲山水','七星潭','阿美族文化'], food:['麻糬','剝皮辣椒','洄瀾薯','原住民烤肉'], note:'太魯閣峽谷，阿美族聚集'},
+      {name:'台東縣', icon:'🌊', capital:'台東市', pop:'約22萬', features:['知本溫泉','小野柳','伯朗大道（金城武樹）','蘭嶼（雅美族）','綠島'], food:['釋迦','旗魚','飛魚（蘭嶼）','小米酒'], note:'後山淨土，原住民族多元'},
+    ]
+  },
+  {
+    region: '離島',
+    counties: [
+      {name:'澎湖縣', icon:'🐠', capital:'馬公市', pop:'約10萬', features:['玄武岩地質','天后宮（全台最古老媽祖廟）','跨海大橋','花火節','浮潛聖地'], food:['絲瓜炒文蛤','花生冰棒','黑糖糕','海鮮'], note:'珊瑚礁海域，漁業盛地'},
+      {name:'金門縣', icon:'🏰', capital:'金城鎮', pop:'約14萬', features:['古寧頭戰役遺址','莒光樓','翟山坑道','瓊林聚落','風獅爺'], food:['高粱酒','金門貢糖','蚵仔麵線','芋頭'], note:'戰地風情，高粱酒著名'},
+      {name:'連江縣（馬祖）', icon:'⛪', capital:'南竿鄉', pop:'約1.4萬', features:['藍眼淚（夜光蟲）','北竿島','東莒燈塔','馬祖酒廠','閩東聚落'], food:['繼光餅','老酒麵線','魚麵','蜂巢糕'], note:'閩東文化，藍眼淚奇景'},
+    ]
+  },
+];
+
+function renderTaiwanGrid(search='') {
+  let html = '';
+  for (const region of TAIWAN_REGIONS) {
+    let counties = region.counties;
+    if (search) counties = counties.filter(c => c.name.includes(search) || c.features.some(f=>f.includes(search)) || c.food.some(f=>f.includes(search)));
+    if (!counties.length) continue;
+    html += `<div class="tw-region-title">📍 ${region.region}</div><div class="tw-grid">`;
+    html += counties.map(c =>
+      `<div class="tw-card" onclick="showTaiwanDetail('${c.name}')">
+        <div class="tw-card-icon">${c.icon}</div>
+        <div class="tw-card-info">
+          <div class="tw-card-name">${c.name}</div>
+          <div class="tw-card-sub">${c.food.slice(0,2).join('・')}</div>
+        </div>
+      </div>`
+    ).join('');
+    html += '</div>';
+  }
+  document.getElementById('taiwanGrid').innerHTML = html || '<div class="empty-state"><div class="e">🔍</div><p>找不到符合的縣市</p></div>';
+}
+
+function showTaiwanDetail(name) {
+  const all = TAIWAN_REGIONS.flatMap(r => r.counties);
+  const c = all.find(x => x.name === name);
+  if (!c) return;
+  const div = document.createElement('div');
+  div.style.cssText = 'position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:24px 20px;overflow-y:auto;';
+  div.innerHTML = `
+    <div style="font-size:52px;text-align:center;width:100%;margin-bottom:8px">${c.icon}</div>
+    <div style="font-size:24px;font-weight:900;color:var(--accent);width:100%;text-align:center;margin-bottom:4px">${c.name}</div>
+    <div style="font-size:13px;color:var(--text2);width:100%;text-align:center;margin-bottom:16px">${c.note}</div>
+    <div style="width:100%;background:rgba(255,255,255,.04);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">📋 基本資料</div>
+      <div style="font-size:14px;margin-bottom:4px">🏛️ 縣市政府：<b>${c.capital}</b></div>
+      <div style="font-size:14px">👥 人口：<b>${c.pop}</b></div>
+    </div>
+    <div style="width:100%;background:rgba(255,255,255,.04);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">🌟 特色景點</div>
+      <div>${c.features.map(f=>`<span class="tw-detail-tag">${f}</span>`).join('')}</div>
+    </div>
+    <div style="width:100%;background:rgba(255,255,255,.04);border-radius:12px;padding:14px;margin-bottom:20px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">🍜 特色美食／特產</div>
+      <div>${c.food.map(f=>`<span class="tw-detail-tag" style="background:rgba(20,184,166,.15);border-color:rgba(20,184,166,.3);color:var(--teal)">${f}</span>`).join('')}</div>
+    </div>
+    <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:12px 36px;color:#fff;font-size:15px;cursor:pointer;width:100%">關閉</button>
+  `;
+  document.body.appendChild(div);
+}
+
+// ════════════════════════════════════════
+const CONTINENTS = ['全部','🇹🇼 台灣','亞洲','歐洲','美洲','非洲','大洋洲'];
+let currentContinent = '全部';
+
+function renderMapPage(){
+  document.getElementById('continentTabs').innerHTML = CONTINENTS.map(c=>
+    `<div class="map-ctab ${c===currentContinent?'active':''}" onclick="setContinent('${c}')">${c}</div>`
+  ).join('');
+  const isTW = currentContinent==='🇹🇼 台灣';
+  document.getElementById('flagGrid').style.display = isTW ? 'none' : '';
+  document.getElementById('taiwanGrid').style.display = isTW ? 'block' : 'none';
+  if(isTW) renderTaiwanGrid();
+  else renderFlagGrid();
+}
+
+function setContinent(c){
+  currentContinent = c;
+  document.getElementById('flagSearch').value = '';
+  const isTW = c==='🇹🇼 台灣';
+  document.getElementById('flagGrid').style.display = isTW ? 'none' : '';
+  document.getElementById('taiwanGrid').style.display = isTW ? 'block' : 'none';
+  renderMapPage();
+  if(isTW) renderTaiwanGrid();
+}
+
+function filterFlags(){
+  const search = document.getElementById('flagSearch').value.trim();
+  const isTW = currentContinent==='🇹🇼 台灣';
+  if(isTW){ renderTaiwanGrid(search); return; }
+  renderFlagGrid(search);
+}
+
+function renderFlagGrid(search=''){
+  let list = FLAG_DATA;
+  const isTW = currentContinent==='🇹🇼 台灣';
+  if(isTW){ return; }
+  if(currentContinent !== '全部') list = list.filter(f=>f.continent===currentContinent);
+  if(search) list = list.filter(f=>f.name.includes(search));
+  document.getElementById('flagGrid').innerHTML = list.map(f=>
+    `<div class="flag-card" onclick="showFlagDetail('${f.code}')">
+      <img src="${flagUrl(f.code)}" alt="${f.name}" onerror="this.style.display='none'">
+      <div class="flag-card-name">${f.name}</div>
+    </div>`
+  ).join('');
+  document.querySelectorAll('.map-ctab').forEach(el=>{
+    el.classList.toggle('active', el.textContent===currentContinent);
+  });
+}
+
+function showFlagDetail(code){
+  const f = FLAG_DATA.find(x=>x.code===code);
+  if(!f) return;
+  const div = document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;';
+  div.innerHTML=`
+    <img src="${flagUrl(code)}" alt="${f.name}" style="max-width:240px;width:80%;border-radius:12px;box-shadow:0 0 40px rgba(245,158,11,.4);">
+    <div style="font-size:22px;font-weight:900;color:var(--accent);text-align:center;">${f.name}</div>
+    <div style="font-size:14px;color:var(--text2);text-align:center;">🌍 ${f.continent}　🏛️ 首都：${f.capital}</div>
+    <button onclick="this.parentElement.remove()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:30px;padding:10px 28px;color:#fff;font-size:15px;cursor:pointer;">關閉</button>
+  `;
+  document.body.appendChild(div);
+}
+
+// ════════════════════════════════════════
+// 國旗認識題庫（動態產生）
+// ════════════════════════════════════════
+function generateFlagQuestions(){
+  // 從旗庫隨機抽取，產生「看圖選國名」題型
+  const pool = [...FLAG_DATA].sort(()=>Math.random()-.5);
+  const questions = [];
+  for(let i=0;i<pool.length && questions.length<40;i++){
+    const correct = pool[i];
+    // 隨機取3個錯誤選項（同洲優先）
+    let wrong = FLAG_DATA.filter(f=>f.code!==correct.code && f.continent===correct.continent);
+    if(wrong.length<3) wrong = FLAG_DATA.filter(f=>f.code!==correct.code);
+    wrong = wrong.sort(()=>Math.random()-.5).slice(0,3);
+    if(wrong.length<3) continue;
+    const opts = [correct.name, ...wrong.map(f=>f.name)].sort(()=>Math.random()-.5);
+    const ans = opts.indexOf(correct.name);
+    questions.push({
+      q: `這是哪個國家的國旗？`,
+      flagCode: correct.code,
+      opts,
+      ans,
+      explanation: `${correct.name}，位於${correct.continent}，首都是${correct.capital}。`
+    });
+  }
+  return questions;
+}
+
+// 國旗題庫（預先產生並快取，每次遊戲刷新）
+let _flagQCache = null;
+function getFlagQuestions(){
+  if(!_flagQCache || _flagQCache.length<10) _flagQCache = generateFlagQuestions();
+  return _flagQCache;
+}
+
+// ════════════════════════════════════════
+function switchPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='Collection'){renderCollection();updateCollStats();}
+  if(name==='Life') renderLifePage();
+  if(name==='Achieve') renderAchievePage();
+  if(name==='Map') renderMapPage();
+}
+
+// ════════════════════════════════════════
+// 備份
+// ════════════════════════════════════════
+function exportBackup(){
+  const blob=new Blob([JSON.stringify({version:3,exportTime:new Date().toISOString(),profiles:S.profiles,parentPin:S.parentPin,pendingLife:S.pendingLife,shop:S.shop},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`pokemon_backup_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  showToast('備份已下載！');
+}
+function importBackup(){document.getElementById('importFile').click();}
+function doImport(input){
+  const f=input.files[0];if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d.profiles) throw new Error();
+      S.profiles=d.profiles;S.parentPin=d.parentPin||'2468';
+      S.pendingLife=d.pendingLife||[];S.shop=d.shop||[...DEFAULT_SHOP];
+      saveAll();renderParentDashboard();showToast('備份匯入成功！');
+    }catch{showToast('匯入失敗',true);}
+  };
+  r.readAsText(f);input.value='';
+}
+
+// ════════════════════════════════════════
+// 彈窗 & 通知
+// ════════════════════════════════════════
+function showModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('show');});
+});
+let toastT;
+function showToast(msg,error=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(error?' error':'');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2700);
+}
+</script>
+</body>
+</html>
