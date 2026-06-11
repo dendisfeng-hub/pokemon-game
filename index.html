@@ -6,21 +6,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="寶可夢學習">
-<meta name="theme-color" content="#0f0c29">
+<meta name="theme-color" content="#0a2e25">
 <meta name="mobile-web-app-capable" content="yes">
 <title>寶可夢集卡學習遊戲</title>
 <style>
 :root{
-  --bg:#0f0c29;--bg2:#1a1a3e;--card-bg:#1e1b4b;
-  --accent:#f59e0b;--accent2:#ec4899;--green:#10b981;
-  --red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6;--teal:#14b8a6;
-  --text:#f1f5f9;--text2:#94a3b8;--border:#334155;--radius:16px;
+  --bg:#0a2e25;--bg2:#0f3d31;--card-bg:#12463a;
+  --accent:#ffc53d;--accent2:#ff8a3d;--green:#34d399;
+  --red:#f87171;--blue:#38bdf8;--purple:#a78bfa;--teal:#2dd4bf;
+  --text:#f3faf5;--text2:#9fc4b2;--border:#2c5f4d;--radius:16px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-height:100vh;font-family:'Helvetica Neue','PingFang TC','Noto Sans TC',sans-serif;color:var(--text);overflow-x:hidden;}
+body{background:linear-gradient(160deg,#0b3a2e 0%,#11543f 45%,#0a2f33 100%);min-height:100vh;font-family:'Helvetica Neue','PingFang TC','Noto Sans TC',sans-serif;color:var(--text);overflow-x:hidden;}
 
 /* ── 頂部 ── */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(15,12,41,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:8px;}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,38,30,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:8px;}
 .topbar-logo{font-size:18px;}
 .topbar-title{font-size:13px;font-weight:700;flex:1;}
 .chip{border-radius:20px;padding:5px 10px;font-size:12px;font-weight:700;background:var(--card-bg);border:1px solid var(--border);white-space:nowrap;}
@@ -28,7 +28,7 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
 .chip.teal{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;border:none;}
 
 /* ── 底部導覽 ── */
-.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(15,12,41,0.97);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);}
+.bottomnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(8,38,30,0.97);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px;background:none;border:none;color:var(--text2);font-size:10px;cursor:pointer;}
 .nav-btn .icon{font-size:20px;}
 .nav-btn.active{color:var(--accent);}
@@ -113,7 +113,7 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
 .draw-card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.4,0,.2,1);}
 .draw-card-inner.flipped{transform:rotateY(180deg);}
 .draw-card-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;overflow:hidden;box-shadow:0 0 36px rgba(245,158,11,.5);}
-.draw-card-back{background:linear-gradient(135deg,#1e40af,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:68px;}
+.draw-card-back{background:linear-gradient(135deg,#0e7a5f,#2563eb);display:flex;align-items:center;justify-content:center;font-size:68px;}
 .draw-card-front{transform:rotateY(180deg);background:#111;}
 .draw-card-front img{width:100%;height:100%;object-fit:contain;}
 .draw-card-name{font-size:13px;font-weight:700;color:var(--accent);text-align:center;}
@@ -346,13 +346,13 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
 /* ════════════════════════════════════════
    小遊戲
    ════════════════════════════════════════ */
-.minigame-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}
-.minigame-card{background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(59,130,246,.14));border:1px solid rgba(139,92,246,.4);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s;}
+.minigame-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.minigame-card{background:linear-gradient(135deg,rgba(45,212,191,.16),rgba(56,189,248,.12));border:1px solid rgba(45,212,191,.4);border-radius:var(--radius);padding:13px 8px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s;}
 .minigame-card:active{transform:scale(.96);}
-.minigame-card .mg-icon{font-size:34px;margin-bottom:6px;animation:bounce 2.4s infinite;}
-.mg-title{font-size:15px;font-weight:800;}
+.minigame-card .mg-icon{font-size:30px;margin-bottom:6px;animation:bounce 2.4s infinite;}
+.mg-title{font-size:13px;font-weight:800;}
 .mg-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.5;}
-.mg-overlay{position:fixed;inset:0;z-index:260;background:linear-gradient(135deg,#0f0c29,#24243e);display:none;flex-direction:column;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;}
+.mg-overlay{position:fixed;inset:0;z-index:260;background:linear-gradient(160deg,#0b3a2e,#0a2f33);display:none;flex-direction:column;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;}
 .mg-overlay.show{display:flex;}
 .mg-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;max-width:640px;width:100%;margin-inline:auto;}
 .mg-name{font-size:17px;font-weight:900;}
@@ -363,7 +363,7 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
 .mem-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .4s;}
 .mem-card.flip .mem-inner{transform:rotateY(180deg);}
 .mem-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(26px,7vw,40px);}
-.mem-back{background:linear-gradient(135deg,#1e40af,#7c3aed);border:1px solid rgba(255,255,255,.15);}
+.mem-back{background:linear-gradient(135deg,#0e7a5f,#2563eb);border:1px solid rgba(255,255,255,.15);}
 .mem-front{transform:rotateY(180deg);background:var(--card-bg);border:2px solid var(--border);}
 .mem-card.done .mem-front{border-color:var(--green);box-shadow:0 0 14px rgba(16,185,129,.5);}
 .mem-card.done{pointer-events:none;}
@@ -377,6 +377,83 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
 }
+
+/* ════════════════════════════════════════
+   V7 冒險手遊化
+   ════════════════════════════════════════ */
+/* 英雄面板 */
+.hero-card{background:linear-gradient(135deg,rgba(255,197,61,.14),rgba(45,212,191,.1));border:1px solid rgba(255,197,61,.35);border-radius:var(--radius);padding:15px 16px;box-shadow:0 6px 24px rgba(0,0,0,.25);}
+.hero-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.hero-avatar{font-size:42px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.4));animation:bounce 2.6s infinite;}
+.hero-info{flex:1;min-width:0;}
+.hero-name{font-size:18px;font-weight:900;}
+.hero-title{font-size:12px;color:var(--accent);font-weight:700;margin-top:2px;}
+.hero-lv{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#1a1200;font-weight:900;font-size:17px;border-radius:14px;padding:7px 14px;box-shadow:0 3px 10px rgba(255,197,61,.4);}
+.xp-track{background:rgba(0,0,0,.3);border-radius:10px;height:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+.xp-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--teal),var(--accent));transition:width .6s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
+.xp-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shine 2.2s infinite;}
+.hero-meta{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:12px;color:var(--text2);}
+.streak-chip{background:rgba(248,113,113,.16);border:1px solid rgba(248,113,113,.4);color:#fca5a5;border-radius:20px;padding:3px 10px;font-weight:800;font-size:12px;}
+.quest-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px;}
+.quest-item{background:rgba(0,0,0,.22);border:1px solid var(--border);border-radius:12px;padding:8px 6px;text-align:center;font-size:11px;color:var(--text2);line-height:1.45;}
+.quest-item b{display:block;font-size:12px;color:var(--text);}
+.quest-item.done{border-color:var(--green);background:rgba(52,211,153,.12);}
+.quest-item.done b{color:var(--green);}
+.quest-xp{color:var(--accent);font-weight:800;}
+
+/* 冒險之路 */
+.road-wrap{display:flex;gap:0;overflow-x:auto;padding:6px 2px 10px;scrollbar-width:none;}
+.road-wrap::-webkit-scrollbar{display:none;}
+.road-node{flex-shrink:0;width:86px;text-align:center;position:relative;}
+.road-node::after{content:'';position:absolute;top:26px;left:calc(50% + 26px);width:calc(100% - 52px);height:4px;background:var(--border);border-radius:4px;}
+.road-node:last-child::after{display:none;}
+.road-node.cleared::after{background:linear-gradient(90deg,var(--green),var(--teal));}
+.road-dot{width:52px;height:52px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--card-bg);border:2px solid var(--border);position:relative;z-index:1;}
+.road-node.cleared .road-dot{border-color:var(--green);background:rgba(52,211,153,.15);box-shadow:0 0 12px rgba(52,211,153,.35);}
+.road-node.current .road-dot{border-color:var(--accent);background:rgba(255,197,61,.16);animation:roadPulse 1.6s infinite;}
+@keyframes roadPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,197,61,.5);}50%{box-shadow:0 0 0 9px rgba(255,197,61,0);}}
+.road-node.locked .road-dot{filter:grayscale(1);opacity:.55;}
+.road-name{font-size:11px;font-weight:700;}
+.road-need{font-size:10px;color:var(--text2);margin-top:1px;}
+.road-node.current .road-name{color:var(--accent);}
+
+/* 返回鍵 */
+.quiz-back{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:20px;color:var(--text);padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;}
+.quiz-back:active{transform:scale(.95);}
+
+/* 升級橫幅 */
+.lvlup-pop{position:fixed;top:30%;left:50%;transform:translate(-50%,-50%) scale(.6);z-index:360;background:linear-gradient(135deg,#ffc53d,#ff8a3d,#f472b6);color:#1a1200;font-weight:900;text-align:center;padding:18px 34px;border-radius:24px;opacity:0;pointer-events:none;box-shadow:0 12px 44px rgba(255,197,61,.5);}
+.lvlup-pop .l1{font-size:24px;}
+.lvlup-pop .l2{font-size:14px;margin-top:3px;}
+.lvlup-pop.show{animation:lvlupAnim 2s ease forwards;}
+@keyframes lvlupAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5);}14%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}24%{transform:translate(-50%,-50%) scale(1);}82%{opacity:1;}100%{opacity:0;transform:translate(-50%,-58%) scale(.95);}}
+
+/* 寶石合成 */
+.mrg-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:380px;width:100%;margin:0 auto;background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:16px;padding:10px;touch-action:none;}
+.mrg-cell{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.05);font-weight:900;}
+.mrg-cell .g{font-size:clamp(22px,6.5vw,32px);line-height:1;}
+.mrg-cell .v{font-size:clamp(12px,3.4vw,15px);margin-top:1px;}
+.mrg-cell.pop{animation:popIn .25s ease;}
+.mrg-2{background:rgba(148,163,184,.22);}.mrg-4{background:rgba(52,211,153,.25);}
+.mrg-8{background:rgba(56,189,248,.25);}.mrg-16{background:rgba(167,139,250,.28);}
+.mrg-32{background:rgba(244,114,182,.3);}.mrg-64{background:rgba(255,138,61,.32);}
+.mrg-128{background:linear-gradient(135deg,rgba(255,197,61,.5),rgba(244,114,182,.45));box-shadow:0 0 14px rgba(255,197,61,.55);}
+.mrg-256{background:linear-gradient(90deg,#f43f5e,#ffc53d,#34d399,#38bdf8);background-size:300% 100%;animation:urShift 2.5s linear infinite;}
+
+/* 九級稀有度 */
+.r-C{background:#52706a;color:#e7f2ec;}
+.r-U{background:linear-gradient(135deg,#15803d,#4ade80);color:#fff;}
+.r-R{background:linear-gradient(135deg,#2563eb,#38bdf8);color:#fff;}
+.r-RR{background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;}
+.r-AR{background:linear-gradient(135deg,#0d9488,#5eead4);color:#063;color:#04342c;}
+.r-SR{background:linear-gradient(135deg,#ffc53d,#ff8a3d);color:#1a1200;}
+.r-SAR{background:linear-gradient(135deg,#e11d48,#a78bfa,#38bdf8);background-size:240% 100%;color:#fff;animation:urShift 3s linear infinite;}
+.r-UR{background:linear-gradient(90deg,#f43f5e,#ffc53d,#34d399,#38bdf8,#a78bfa);background-size:300% 100%;color:#fff;animation:urShift 2.5s linear infinite;}
+
+/* 樹葉飄落 */
+.bg-leaf{position:fixed;top:-6%;pointer-events:none;z-index:0;opacity:.5;animation:leafFall linear infinite;}
+@keyframes leafFall{0%{transform:translateY(-4vh) rotate(0deg);}100%{transform:translateY(108vh) rotate(340deg);}}
+@media(min-width:768px){.quest-item{font-size:12px;}.road-node{width:96px;}}
 </style>
 </head>
 <body>
@@ -397,6 +474,7 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
   <div class="topbar">
     <div class="topbar-logo">🎮</div>
     <div class="topbar-title">寶可夢集卡學習</div>
+    <div class="chip gold" id="topLv">Lv.1</div>
     <div class="chip" id="topCollected">🃏 0</div>
     <div class="chip teal" id="topPts">⭐ 0分</div>
     <div class="chip" id="topUser" style="cursor:pointer" onclick="logout()">登出</div>
@@ -406,28 +484,50 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
     <!-- 答題頁 -->
     <div id="pageQuiz" class="page active">
       <div id="subjectPicker">
-        <div class="subject-tabs" id="subjectTabs"></div>
-        <div class="card" style="text-align:center;padding:28px">
-          <div style="font-size:44px;margin-bottom:10px">🎯</div>
-          <div style="font-size:16px;font-weight:700;margin-bottom:5px">選擇科目開始本回合</div>
-          <div style="font-size:13px;color:var(--text2)">每回合 10 題，答對 8 題以上即可抽卡</div>
-          <div style="font-size:13px;color:var(--accent);margin-top:6px">💡 每回合有 1 次改答機會</div>
+        <!-- 英雄面板 -->
+        <div class="hero-card">
+          <div class="hero-top">
+            <div class="hero-avatar" id="heroAvatar">🐱</div>
+            <div class="hero-info">
+              <div class="hero-name" id="heroName"></div>
+              <div class="hero-title" id="heroTitle">新手訓練家</div>
+            </div>
+            <div class="hero-lv" id="heroLv">Lv.1</div>
+          </div>
+          <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+          <div class="hero-meta">
+            <span id="xpText">0 / 80 XP</span>
+            <span class="streak-chip" id="streakChip">🔥 連續 1 天</span>
+          </div>
+          <div class="quest-strip" id="questStrip"></div>
         </div>
+        <!-- 冒險之路 -->
+        <div class="section-title" style="margin-top:14px">🗺️ 冒險之路（完成回合解鎖新地區）</div>
+        <div class="road-wrap" id="roadWrap"></div>
+        <!-- 科目挑戰 -->
+        <div class="section-title">⚔️ 關卡挑戰（10 題，答對 8 題抽卡）</div>
+        <div class="subject-tabs" id="subjectTabs"></div>
         <div class="section-title">🎮 趣味小遊戲（每日通關可加抽 1 張卡）</div>
         <div class="minigame-row">
           <div class="minigame-card" onclick="openMemoryGame()">
             <div class="mg-icon">🧩</div>
             <div class="mg-title">記憶翻翻樂</div>
-            <div class="mg-sub">翻出所有配對<br><span id="mgMemBest">最佳：--</span></div>
+            <div class="mg-sub"><span id="mgMemBest">最佳：--</span></div>
           </div>
           <div class="minigame-card" onclick="openSpeedGame()">
             <div class="mg-icon">⚡</div>
             <div class="mg-title">限時搶答</div>
-            <div class="mg-sub">60 秒挑戰<br><span id="mgSpdBest">最佳：--</span></div>
+            <div class="mg-sub"><span id="mgSpdBest">最佳：--</span></div>
+          </div>
+          <div class="minigame-card" onclick="openMergeGame()">
+            <div class="mg-icon">💎</div>
+            <div class="mg-title">寶石合成</div>
+            <div class="mg-sub"><span id="mgMrgBest">最佳：--</span></div>
           </div>
         </div>
       </div>
       <div id="quizArea" style="display:none">
+        <button class="quiz-back" onclick="quitRound()">← 返回</button>
         <div class="round-bar">
           <div class="round-info">
             <span class="round-label" id="roundLabel">第 1 / 10 題</span>
@@ -534,6 +634,7 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
             <div style="font-size:13px;color:var(--text2)">累計答對 <span id="settingTotal"></span> 題</div>
           </div>
         </div>
+        <button class="btn btn-secondary" style="margin-bottom:10px" onclick="showMyPin()">🔑 設定我的登入密碼</button>
         <button class="btn btn-secondary" onclick="logout()">登出</button>
       </div>
       <div class="card">
@@ -574,6 +675,7 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
     <div class="modal-title">➕ 新增小朋友</div>
     <div class="form-group"><div class="form-label">選擇頭像</div><div class="avatar-grid" id="avatarGrid"></div></div>
     <div class="form-group"><div class="form-label">名字（最多6字）</div><input class="form-input" id="newProfileName" placeholder="輸入名字" maxlength="6"></div>
+    <div class="form-group"><div class="form-label">登入密碼（選填，4 位數字，防止別人開啟）</div><input class="form-input" id="newProfilePin" type="tel" placeholder="不設定請留空" maxlength="4" style="text-align:center;letter-spacing:8px"></div>
     <div style="display:flex;gap:10px">
       <button class="btn btn-secondary" onclick="closeModal('addProfileModal')">取消</button>
       <button class="btn btn-primary" onclick="addProfile()">確定</button>
@@ -670,6 +772,46 @@ body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'He
   <div class="mg-result" id="spdResult"></div>
 </div>
 
+<!-- ══ 小遊戲：寶石合成 ══ -->
+<div class="mg-overlay" id="mergeOverlay">
+  <div class="mg-head">
+    <div class="mg-name">💎 寶石合成</div>
+    <button class="mg-close" onclick="closeMergeGame()">✕ 離開</button>
+  </div>
+  <div class="mg-stats">
+    <div class="chip">🎯 目標：合成 <b style="color:var(--accent)">128</b></div>
+    <div class="chip teal">⭐ 分數 <span id="mrgScore">0</span></div>
+  </div>
+  <div style="text-align:center;font-size:12px;color:var(--text2);margin-bottom:10px">👆 上下左右滑動（電腦用方向鍵），相同寶石相撞會合成！</div>
+  <div class="mrg-grid" id="mrgGrid"></div>
+  <div class="mg-result" id="mrgResult"></div>
+</div>
+
+<!-- ══ 彈窗：角色登入密碼 ══ -->
+<div class="modal-overlay" id="childPinModal">
+  <div class="modal">
+    <div class="modal-title" id="childPinTitle">🔑 輸入登入密碼</div>
+    <div style="text-align:center;padding:14px 0">
+      <div class="pin-dots" id="childPinDots"></div>
+      <div class="pin-pad" id="childPinPad"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 彈窗：設定我的密碼 ══ -->
+<div class="modal-overlay" id="myPinModal">
+  <div class="modal">
+    <div class="modal-title">🔑 設定我的登入密碼</div>
+    <div class="form-group"><div class="form-label">新密碼（4 位數字，留空表示取消密碼）</div>
+      <input class="form-input" id="myPinInput" type="tel" maxlength="4" placeholder="輸入 4 位數字" style="text-align:center;letter-spacing:10px;font-size:22px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary" onclick="closeModal('myPinModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveMyPin()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="lvlup-pop" id="lvlupPop"></div>
 <div class="combo-pop" id="comboPop"></div>
 <canvas id="confettiCanvas" style="position:fixed;inset:0;z-index:600;pointer-events:none;"></canvas>
 
@@ -1185,11 +1327,6 @@ function getUncollectedCard(){
 // ════════════════════════════════════════
 window.onload=async function(){
   loadAll();
-  // 首次啟動：尚未設定 PIN 碼，引導家長設定
-  if(!localStorage.getItem(PIN_SET_KEY)){
-    showFirstPinSetup();
-    return;
-  }
   renderLogin();checkServer();loadCardPool();
 };
 
@@ -1244,7 +1381,21 @@ function renderLogin(){
   ).join('');
 }
 function login(id){
+  const p=getProfile(id);if(!p) return;
+  if(p.pin){showChildPin(id);return;}
+  doLogin(id);
+}
+function doLogin(id){
   S.currentId=id;const p=cur();
+  // 連續登入與每日任務重置
+  const t=todayKey();
+  if(p.lastLogin!==t){
+    const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    p.streak=(p.lastLogin===y)?(p.streak||0)+1:1;
+    p.lastLogin=t;
+    p.quests={date:t,login:false,round:false,pass:false};
+  }
+  p.quests=p.quests&&p.quests.date===t?p.quests:{date:t,login:false,round:false,pass:false};
   document.getElementById('topUser').textContent=p.avatar+' '+p.name;
   document.getElementById('topCollected').textContent='🃏 '+p.collected.length;
   document.getElementById('topPts').textContent='⭐ '+(p.lifePoints||0)+'分';
@@ -1254,6 +1405,9 @@ function login(id){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('gameScreen').style.display='block';
   renderSubjectTabs();showSubjectPicker();updateCollStats();updateMiniBest();
+  // 每日登入任務：自動完成
+  if(!p.quests.login){p.quests.login=true;saveAll();setTimeout(()=>{addXP(20);showToast(`🔥 連續登入 ${p.streak} 天！任務完成 +20 XP`);},400);}
+  updateHeroUI();renderRoad();renderQuests();
 }
 function logout(){
   S.currentId=null;
@@ -1276,8 +1430,12 @@ function showAddProfile(){
 function selAv(el,av){document.querySelectorAll('.avatar-opt').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');selAvatar=av;}
 function addProfile(){
   const name=document.getElementById('newProfileName').value.trim();
+  const pin=document.getElementById('newProfilePin').value.trim();
   if(!name){showToast('請輸入名字！',true);return;}
-  S.profiles.push(newProfile(name,selAvatar));saveAll();
+  if(pin&&!/^\d{4}$/.test(pin)){showToast('密碼需為 4 位數字，或留空不設定',true);return;}
+  const np=newProfile(name,selAvatar);
+  if(pin) np.pin=pin;
+  S.profiles.push(np);saveAll();
   closeModal('addProfileModal');renderLogin();showToast(`歡迎 ${selAvatar} ${name}！`);
 }
 
@@ -1431,7 +1589,7 @@ function recordAnswer(isCorrect){
   R.answers[R.currentIdx]=isCorrect;
   if(isCorrect) R.correctCount++;
   // 連擊與加分特效
-  if(isCorrect){_streak++;floatStar('+1 ⭐');if(_streak>=3)showCombo(_streak);}
+  if(isCorrect){_streak++;floatStar('+10 XP');if(_streak>=3)showCombo(_streak);}
   else _streak=0;
   document.getElementById('qDots').innerHTML=R.questions.map((_,i)=>{
     let cls='q-dot';
@@ -1476,6 +1634,13 @@ function showResult(){
   document.getElementById('resultSub').textContent=pass?`答對 ${R.correctCount} 題，超棒！`:`差一點！再試一次！（需答對 ${ROUND_PASS} 題）`;
   countUp(document.getElementById('scoreBig'),R.correctCount);
   if(pass) fireConfetti(120);
+  // ── V7：XP、每日任務、地區解鎖 ──
+  addXP(R.correctCount*10+(pass?60:20));
+  if(p.quests&&p.quests.date===todayKey()){
+    if(!p.quests.round){p.quests.round=true;addXP(30);setTimeout(()=>showToast('🎯 任務完成：完成 1 回合 +30 XP'),600);}
+    if(pass&&!p.quests.pass){p.quests.pass=true;addXP(50);setTimeout(()=>showToast('🎯 任務完成：單回合答對 8 題 +50 XP'),1300);}
+  }
+  checkRoadUnlock(p);saveAll();renderQuests();
   document.getElementById('scoreCircle').className='score-circle'+(pass?'':' fail');
   document.getElementById('rCorrect').textContent=R.correctCount+' / '+ROUND_TOTAL;
   document.getElementById('rChanged').textContent=R.changed.some(c=>c)?'✅ 使用 1 次':'未使用';
@@ -1486,7 +1651,7 @@ function showResult(){
   btnDraw.style.display=pass?'block':'none';
   if(pass) btnDraw.disabled=false;
 }
-function startNewRound(){showSubjectPicker();}
+function startNewRound(){showSubjectPicker();renderRoad();renderQuests();updateHeroUI();}
 
 // ════════════════════════════════════════
 // 抽卡動畫
@@ -2347,16 +2512,17 @@ function showToast(msg,error=false){
 // ════════════════════════════════════════
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// 漂浮星星背景
+// 飄落樹葉與螢火（森林氛圍）
 (function(){
   if(REDUCED) return;
-  for(let i=0;i<14;i++){
-    const s=document.createElement('div');s.className='bg-star';
-    const sz=2+Math.random()*3;
-    s.style.width=sz+'px';s.style.height=sz+'px';
-    s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*100)+'%';
-    s.style.animationDelay=(Math.random()*4)+'s';
-    s.style.animationDuration=(3+Math.random()*4)+'s';
+  const LEAVES=['🍃','🍃','🌿','✨','🍂'];
+  for(let i=0;i<10;i++){
+    const s=document.createElement('div');s.className='bg-leaf';
+    s.textContent=LEAVES[i%LEAVES.length];
+    s.style.left=(Math.random()*100)+'%';
+    s.style.fontSize=(11+Math.random()*12)+'px';
+    s.style.animationDuration=(9+Math.random()*12)+'s';
+    s.style.animationDelay=(-Math.random()*16)+'s';
     document.body.appendChild(s);
   }
 })();
@@ -2414,19 +2580,30 @@ function countUp(el,to,dur=700){
 
 // ════════════════════════════════════════
 // 卡片稀有度（依檔名自動判定，同一張卡稀有度固定）
+// 比照真實寶可夢卡牌分級
 // ════════════════════════════════════════
 const RARITY={
-  C: {label:'C ‧ 普通',     glow:'rgba(148,163,184,.45)', confetti:0},
-  R: {label:'R ‧ 稀有',     glow:'rgba(59,130,246,.6)',   confetti:40},
-  RR:{label:'RR ‧ 雙重稀有', glow:'rgba(168,85,247,.65)',  confetti:80},
-  SR:{label:'SR ‧ 超稀有',  glow:'rgba(245,158,11,.75)',  confetti:140},
-  UR:{label:'UR ‧ 究極稀有', glow:'rgba(244,63,94,.8)',    confetti:220},
+  C:  {label:'C ◆ 普通',        glow:'rgba(148,163,184,.45)', confetti:0},
+  U:  {label:'U ◆◆ 少見',       glow:'rgba(74,222,128,.55)',  confetti:30},
+  R:  {label:'R ◆◆◆ 稀有',      glow:'rgba(56,189,248,.6)',   confetti:50},
+  RR: {label:'RR ◆◆◆◆ 雙重稀有', glow:'rgba(192,132,252,.65)', confetti:80},
+  AR: {label:'AR ★ 美術稀有',    glow:'rgba(94,234,212,.7)',   confetti:110},
+  SR: {label:'SR ★★ 超稀有',    glow:'rgba(255,197,61,.75)',  confetti:150},
+  SAR:{label:'SAR ★★★ 特典美術', glow:'rgba(225,29,72,.78)',   confetti:190},
+  UR: {label:'UR ★★★★ 究極稀有', glow:'rgba(244,63,94,.8)',    confetti:240},
 };
 function cardRarity(f){
   let h=0;
   for(let i=0;i<f.length;i++) h=(h*31+f.charCodeAt(i))>>>0;
-  const r=h%100;
-  return r<3?'UR':r<10?'SR':r<25?'RR':r<55?'R':'C';
+  const r=h%1000;
+  if(r<300) return 'C';      // 30%
+  if(r<540) return 'U';      // 24%
+  if(r<700) return 'R';      // 16%
+  if(r<820) return 'RR';     // 12%
+  if(r<900) return 'AR';     // 8%
+  if(r<955) return 'SR';     // 5.5%
+  if(r<985) return 'SAR';    // 3%
+  return 'UR';               // 1.5%
 }
 
 // ════════════════════════════════════════
@@ -2443,6 +2620,8 @@ function updateMiniBest(){
   const a=document.getElementById('mgMemBest'),b=document.getElementById('mgSpdBest');
   if(a) a.textContent=m.memBestTime!=null?`最佳：${m.memBestTime} 秒`:'最佳：--';
   if(b) b.textContent=m.spdBest?`最佳：${m.spdBest} 題`:'最佳：--';
+  const c=document.getElementById('mgMrgBest');
+  if(c) c.textContent=m.mrgBest?`最佳：${m.mrgBest} 分`:'最佳：--';
 }
 function miniRewardAvailable(key){
   const m=miniBestData();
@@ -2502,7 +2681,7 @@ function memFlip(i){
 }
 function memWin(){
   clearInterval(MEM.timer);
-  fireConfetti(120);
+  fireConfetti(120);addXP(40);
   const m=miniBestData();let newBest=false;
   if(m&&(m.memBestTime==null||MEM.sec<m.memBestTime)){m.memBestTime=MEM.sec;m.memBestMoves=MEM.moves;newBest=true;saveAll();}
   const canReward=miniRewardAvailable('memory');
@@ -2586,7 +2765,7 @@ function spdEnd(){
   const m=miniBestData();let newBest=false;
   if(m&&SPD.score>(m.spdBest||0)){m.spdBest=SPD.score;newBest=true;saveAll();}
   const pass=SPD.score>=SPD_PASS;
-  if(pass) fireConfetti(120);
+  if(pass){fireConfetti(120);addXP(40);}
   const canReward=pass&&miniRewardAvailable('speed');
   document.getElementById('spdArea').style.display='none';
   const res=document.getElementById('spdResult');
@@ -2608,6 +2787,272 @@ function closeSpeedGame(){
   document.getElementById('speedOverlay').classList.remove('show');
   updateMiniBest();
 }
+
+// ════════════════════════════════════════
+// V7：等級與稱號系統
+// ════════════════════════════════════════
+const LV_TITLES=['新手訓練家','見習訓練家','勇敢探險者','森林小勇士','精靈好朋友','寶可夢學徒','聰明小達人','閃亮收藏家','智慧挑戰者','超級訓練家','菁英學員','道館挑戰者','道館高手','傳說獵人','地區冠軍','全國冠軍','世界挑戰者','世界冠軍','傳奇大師','寶可夢博士'];
+const LV_CAP=40;
+function lvNeed(lv){return 80+(lv-1)*50;}
+function lvTitle(lv){return LV_TITLES[Math.min(LV_TITLES.length-1,Math.floor((lv-1)/2))];}
+function addXP(n){
+  const p=cur();if(!p||!n) return;
+  p.lv=p.lv||1;p.xp=(p.xp||0)+n;
+  let leveled=false;
+  while(p.lv<LV_CAP&&p.xp>=lvNeed(p.lv)){p.xp-=lvNeed(p.lv);p.lv++;leveled=true;}
+  saveAll();updateHeroUI();
+  if(leveled) levelUpFx(p.lv);
+}
+function levelUpFx(lv){
+  fireConfetti(170);
+  const el=document.getElementById('lvlupPop');
+  el.innerHTML=`<div class="l1">⬆️ 升級！Lv.${lv}</div><div class="l2">獲得稱號：${lvTitle(lv)}</div>`;
+  el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+}
+function updateHeroUI(){
+  const p=cur();if(!p) return;
+  p.lv=p.lv||1;p.xp=p.xp||0;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('topLv','Lv.'+p.lv);
+  set('heroLv','Lv.'+p.lv);
+  set('heroName',p.name);
+  set('heroTitle','🏅 '+lvTitle(p.lv));
+  set('heroAvatar',p.avatar);
+  set('xpText',`${p.xp} / ${lvNeed(p.lv)} XP`);
+  set('streakChip',`🔥 連續 ${p.streak||1} 天`);
+  const f=document.getElementById('xpFill');
+  if(f) f.style.width=Math.min(100,p.xp/lvNeed(p.lv)*100)+'%';
+}
+
+// ════════════════════════════════════════
+// V7：每日任務
+// ════════════════════════════════════════
+function renderQuests(){
+  const p=cur();if(!p) return;
+  const q=(p.quests&&p.quests.date===todayKey())?p.quests:{login:false,round:false,pass:false};
+  const defs=[
+    {k:'login',name:'每日登入',xp:20},
+    {k:'round',name:'完成 1 回合',xp:30},
+    {k:'pass',name:'答對 8 題',xp:50},
+  ];
+  const el=document.getElementById('questStrip');
+  if(el) el.innerHTML=defs.map(d=>`
+    <div class="quest-item ${q[d.k]?'done':''}">
+      <b>${q[d.k]?'✅':'🎯'} ${d.name}</b>
+      <span class="quest-xp">+${d.xp} XP</span>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════
+// V7：冒險之路（完成回合解鎖地區）
+// ════════════════════════════════════════
+const ROAD=[
+  {need:0, icon:'🏠',name:'新手村'},
+  {need:2, icon:'🌳',name:'翠綠森林'},
+  {need:5, icon:'🏖️',name:'碧藍海灘'},
+  {need:9, icon:'⛰️',name:'岩石山道'},
+  {need:14,icon:'🏜️',name:'黃金沙漠'},
+  {need:20,icon:'❄️',name:'冰雪山峰'},
+  {need:27,icon:'🌋',name:'火山地帶'},
+  {need:35,icon:'🏯',name:'神祕古城'},
+  {need:44,icon:'🌌',name:'星空高原'},
+  {need:54,icon:'🏟️',name:'冠軍競技場'},
+  {need:65,icon:'👑',name:'傳說殿堂'},
+];
+function roadIndex(p){let i=0;ROAD.forEach((r,k)=>{if((p.totalRounds||0)>=r.need)i=k;});return i;}
+function renderRoad(){
+  const p=cur();if(!p) return;
+  const cur_i=roadIndex(p);
+  const el=document.getElementById('roadWrap');
+  if(!el) return;
+  el.innerHTML=ROAD.map((r,i)=>{
+    const cls=i<cur_i?'cleared':i===cur_i?'current':'locked';
+    const need=i>cur_i?`再 ${r.need-(p.totalRounds||0)} 回合`:i===cur_i?'目前位置':'已通過';
+    return `<div class="road-node ${cls}">
+      <div class="road-dot">${i<=cur_i?r.icon:'🔒'}</div>
+      <div class="road-name">${r.name}</div>
+      <div class="road-need">${need}</div>
+    </div>`;
+  }).join('');
+  // 自動捲到目前位置
+  setTimeout(()=>{const node=el.children[cur_i];if(node)el.scrollLeft=Math.max(0,node.offsetLeft-el.clientWidth/2+45);},80);
+}
+function checkRoadUnlock(p){
+  const i=roadIndex(p);
+  p.roadReached=p.roadReached||0;
+  if(i>p.roadReached){
+    p.roadReached=i;
+    const r=ROAD[i];
+    setTimeout(()=>{fireConfetti(160);showToast(`🗺️ 解鎖新地區：${r.icon} ${r.name}！+100 XP`);addXP(100);renderRoad();},2000);
+  }
+}
+
+// ════════════════════════════════════════
+// V7：角色登入密碼
+// ════════════════════════════════════════
+let _childPinTarget=null,_childPinInput='';
+function showChildPin(id){
+  _childPinTarget=id;_childPinInput='';
+  const p=getProfile(id);
+  document.getElementById('childPinTitle').textContent=`🔑 ${p.avatar} ${p.name} 的登入密碼`;
+  renderChildPinDots();
+  document.getElementById('childPinPad').innerHTML=
+    ['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>
+      k===''?'<div></div>':`<div class="pin-key" onclick="childPinPress('${k}')">${k}</div>`
+    ).join('');
+  showModal('childPinModal');
+}
+function renderChildPinDots(){
+  document.getElementById('childPinDots').innerHTML=[0,1,2,3].map(i=>`<div class="pin-dot ${i<_childPinInput.length?'filled':''}"></div>`).join('');
+}
+function childPinPress(k){
+  if(k==='⌫') _childPinInput=_childPinInput.slice(0,-1);
+  else if(_childPinInput.length<4) _childPinInput+=k;
+  renderChildPinDots();
+  if(_childPinInput.length===4){
+    setTimeout(()=>{
+      const p=getProfile(_childPinTarget);
+      if(p&&_childPinInput===p.pin){closeModal('childPinModal');doLogin(_childPinTarget);}
+      else{showToast('密碼錯誤！',true);_childPinInput='';renderChildPinDots();}
+    },180);
+  }
+}
+function showMyPin(){
+  document.getElementById('myPinInput').value=cur()?.pin||'';
+  showModal('myPinModal');
+}
+function saveMyPin(){
+  const p=cur();if(!p) return;
+  const v=document.getElementById('myPinInput').value.trim();
+  if(v&&!/^\d{4}$/.test(v)){showToast('密碼需為 4 位數字，或留空取消',true);return;}
+  if(v) p.pin=v; else delete p.pin;
+  saveAll();closeModal('myPinModal');
+  showToast(v?'🔑 登入密碼已設定！':'已取消登入密碼');
+}
+
+// ════════════════════════════════════════
+// V7：放棄本回合（返回鍵）
+// ════════════════════════════════════════
+function quitRound(){
+  const answered=R.answers&&R.answers.some(a=>a!==null);
+  if(answered&&!confirm('要放棄本回合嗎？目前進度不會計入。')) return;
+  R.pendingChange=false;
+  showSubjectPicker();renderRoad();renderQuests();updateHeroUI();
+}
+
+// ════════════════════════════════════════
+// V7 小遊戲三：寶石合成（2048 玩法）
+// ════════════════════════════════════════
+const MRG_GEMS={2:'🟤',4:'🟢',8:'🔵',16:'🟣',32:'🌸',64:'🟠',128:'⭐',256:'🌈'};
+let MRG={b:[],score:0,won:false,over:false,tx:0,ty:0};
+function openMergeGame(){
+  MRG.b=Array(16).fill(0);MRG.score=0;MRG.won=false;MRG.over=false;
+  mrgSpawn();mrgSpawn();
+  document.getElementById('mrgScore').textContent=0;
+  document.getElementById('mrgResult').style.display='none';
+  document.getElementById('mrgGrid').style.display='grid';
+  mrgRender();
+  document.getElementById('mergeOverlay').classList.add('show');
+}
+function mrgSpawn(){
+  const empty=MRG.b.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
+  if(!empty.length) return;
+  MRG.b[empty[Math.floor(Math.random()*empty.length)]]=Math.random()<.9?2:4;
+}
+function mrgRender(popIdx=[]){
+  document.getElementById('mrgGrid').innerHTML=MRG.b.map((v,i)=>
+    `<div class="mrg-cell ${v?'mrg-'+v:''} ${popIdx.includes(i)?'pop':''}">${v?`<div class="g">${MRG_GEMS[v]||'💎'}</div><div class="v">${v}</div>`:''}</div>`
+  ).join('');
+  document.getElementById('mrgScore').textContent=MRG.score;
+}
+function mrgMove(dir){ // 0左 1右 2上 3下
+  if(MRG.over) return;
+  const get=(r,c)=>MRG.b[r*4+c],set=(r,c,v)=>MRG.b[r*4+c]=v;
+  let moved=false;const popIdx=[];
+  for(let line=0;line<4;line++){
+    // 取出一列（依方向）
+    let vals=[];
+    for(let k=0;k<4;k++){
+      const v=dir===0?get(line,k):dir===1?get(line,3-k):dir===2?get(k,line):get(3-k,line);
+      if(v) vals.push(v);
+    }
+    // 合併
+    const out=[];
+    for(let k=0;k<vals.length;k++){
+      if(vals[k]===vals[k+1]){const nv=vals[k]*2;out.push(nv);MRG.score+=nv;k++;
+        if(nv>=128&&!MRG.won){MRG.won=true;setTimeout(mrgWin,350);}
+      } else out.push(vals[k]);
+    }
+    while(out.length<4) out.push(0);
+    // 寫回
+    for(let k=0;k<4;k++){
+      const v=out[k];
+      const r=dir===0?line:dir===1?line:dir===2?k:3-k;
+      const c=dir===0?k:dir===1?3-k:line;
+      if(get(r,c)!==v){moved=true;if(v)popIdx.push(r*4+c);}
+      set(r,c,v);
+    }
+  }
+  if(moved){mrgSpawn();mrgRender(popIdx);if(!mrgCanMove())mrgOver();}
+}
+function mrgCanMove(){
+  for(let i=0;i<16;i++){
+    if(MRG.b[i]===0) return true;
+    const r=Math.floor(i/4),c=i%4;
+    if(c<3&&MRG.b[i]===MRG.b[i+1]) return true;
+    if(r<3&&MRG.b[i]===MRG.b[i+4]) return true;
+  }
+  return false;
+}
+function mrgWin(){
+  fireConfetti(140);addXP(40);
+  const m=miniBestData();let newBest=false;
+  if(m&&MRG.score>(m.mrgBest||0)){m.mrgBest=MRG.score;newBest=true;saveAll();}
+  const canReward=miniRewardAvailable('merge');
+  document.getElementById('mrgGrid').style.display='none';
+  const res=document.getElementById('mrgResult');
+  res.style.display='block';
+  res.innerHTML=`
+    <div style="font-size:60px;margin-bottom:8px">💎</div>
+    <div style="font-size:22px;font-weight:900;margin-bottom:6px">合成出 128 寶石！</div>
+    <div style="color:var(--text2);font-size:14px;margin-bottom:16px">分數 ${MRG.score}${newBest?'<br>🏅 刷新最佳紀錄！':''}</div>
+    ${canReward?`<button class="btn btn-primary" style="margin-bottom:10px" onclick="mrgClaim()">🎴 領取今日獎勵：抽 1 張卡！</button>`:`<div style="color:var(--text2);font-size:13px;margin-bottom:10px">今日獎勵已領取，明天再來！</div>`}
+    <button class="btn btn-secondary" onclick="openMergeGame()">再玩一次</button>`;
+  updateMiniBest();
+}
+function mrgOver(){
+  MRG.over=true;
+  const m=miniBestData();
+  if(m&&MRG.score>(m.mrgBest||0)){m.mrgBest=MRG.score;saveAll();}
+  setTimeout(()=>{
+    document.getElementById('mrgGrid').style.display='none';
+    const res=document.getElementById('mrgResult');
+    res.style.display='block';
+    res.innerHTML=`
+      <div style="font-size:60px;margin-bottom:8px">😅</div>
+      <div style="font-size:22px;font-weight:900;margin-bottom:6px">沒有空間了！</div>
+      <div style="color:var(--text2);font-size:14px;margin-bottom:16px">分數 ${MRG.score}，差一點就合出 128！</div>
+      <button class="btn btn-secondary" onclick="openMergeGame()">再挑戰一次</button>`;
+    updateMiniBest();
+  },350);
+}
+function mrgClaim(){closeMergeGame();claimMiniReward('merge','💎 寶石合成達標！<br>翻開你的卡片！');}
+function closeMergeGame(){document.getElementById('mergeOverlay').classList.remove('show');updateMiniBest();}
+// 觸控滑動與鍵盤
+(function(){
+  const g=document.getElementById('mrgGrid');
+  g.addEventListener('touchstart',e=>{MRG.tx=e.touches[0].clientX;MRG.ty=e.touches[0].clientY;},{passive:true});
+  g.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-MRG.tx,dy=e.changedTouches[0].clientY-MRG.ty;
+    if(Math.max(Math.abs(dx),Math.abs(dy))<24) return;
+    if(Math.abs(dx)>Math.abs(dy)) mrgMove(dx>0?1:0); else mrgMove(dy>0?3:2);
+  },{passive:true});
+  addEventListener('keydown',e=>{
+    if(!document.getElementById('mergeOverlay').classList.contains('show')) return;
+    const map={ArrowLeft:0,ArrowRight:1,ArrowUp:2,ArrowDown:3};
+    if(map[e.key]!=null){e.preventDefault();mrgMove(map[e.key]);}
+  });
+})();
 </script>
 </body>
 </html>
