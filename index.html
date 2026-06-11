@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="寶可夢學習">
+<meta name="theme-color" content="#0f0c29">
+<meta name="mobile-web-app-capable" content="yes">
 <title>寶可夢集卡學習遊戲</title>
 <style>
 :root{
@@ -239,6 +241,142 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
 .tw-card-name{font-size:14px;font-weight:700;}
 .tw-card-sub{font-size:11px;color:var(--text2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .tw-detail-tag{display:inline-block;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:20px;padding:3px 10px;font-size:12px;margin:3px 2px;color:var(--accent);}
+
+/* ════════════════════════════════════════
+   跨裝置最佳化（手機／平板／桌機．iOS／安卓／Windows／Mac）
+   ════════════════════════════════════════ */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,'Helvetica Neue',sans-serif;}
+.login-screen{min-height:100dvh;}
+.form-input,.form-select{font-size:16px;}   /* iOS 點選輸入框不再自動放大 */
+.opt-btn{min-height:58px;font-size:17px;padding:14px 10px;}
+.btn{min-height:48px;}
+.nav-btn{padding:10px 2px;font-size:11px;min-height:54px;}
+.nav-btn .icon{font-size:21px;transition:transform .2s;}
+.nav-btn.active .icon{transform:scale(1.18) translateY(-1px);}
+.subject-tab{padding:9px 16px;font-size:14px;}
+.q-text{font-size:clamp(19px,2.6vw,24px);}
+.q-dot{width:24px;height:24px;font-size:11px;}
+
+/* 桌機滑鼠懸停回饋 */
+@media(hover:hover){
+  .opt-btn:not(.disabled):hover{border-color:var(--accent);transform:translateY(-2px);}
+  .profile-card:hover,.flag-card:hover,.tw-card:hover,.life-item:hover,.minigame-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .card-thumb:hover{transform:scale(1.05);}
+  .subject-tab:hover,.map-ctab:hover{border-color:var(--accent);}
+  .nav-btn:hover{color:var(--text);}
+  .btn:hover,.shop-btn:not(:disabled):hover,.draw-btn-next:hover{filter:brightness(1.1);}
+  .pin-key:hover,.mg-close:hover{border-color:var(--accent);}
+}
+
+/* 平板（≥768px） */
+@media(min-width:768px){
+  .main{max-width:720px;padding:80px 24px 100px;}
+  .topbar{padding:12px 20px;}
+  .topbar-title{font-size:15px;}
+  .chip{font-size:13px;padding:6px 12px;}
+  .profile-grid{grid-template-columns:repeat(3,1fr);max-width:560px;}
+  .login-title{font-size:34px;}
+  .cards-grid{grid-template-columns:repeat(5,1fr);gap:10px;}
+  .flag-grid{grid-template-columns:repeat(6,1fr);}
+  .tw-grid{grid-template-columns:repeat(3,1fr);}
+  .options-grid{gap:12px;}
+  .opt-btn{min-height:64px;font-size:18px;}
+  .nav-btn{font-size:12px;}
+  .nav-btn .icon{font-size:23px;}
+  .mem-grid{max-width:480px;gap:10px;}
+}
+
+/* 桌機（≥1080px）：底部導覽改為左側導覽列 */
+@media(min-width:1080px){
+  #gameScreen{padding-left:96px;}
+  #gameScreen .topbar{left:96px;}
+  .bottomnav{top:0;bottom:0;left:0;right:auto;width:96px;flex-direction:column;justify-content:center;gap:10px;border-top:none;border-right:1px solid var(--border);padding-bottom:0;}
+  .nav-btn{flex:0 0 auto;padding:13px 4px;border-radius:14px;margin:0 9px;}
+  .nav-btn.active{background:rgba(245,158,11,.12);}
+  .main{max-width:880px;padding-top:86px;}
+  .draw-card-wrap{width:230px;height:322px;}
+  .modal{max-width:480px;}
+  .mem-grid{max-width:520px;}
+}
+
+/* ════════════════════════════════════════
+   遊戲感強化：動畫
+   ════════════════════════════════════════ */
+@keyframes pageIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.page.active{animation:pageIn .28s ease;}
+@keyframes qIn{from{opacity:0;transform:translateX(26px);}to{opacity:1;transform:none;}}
+.anim-in{animation:qIn .3s ease;}
+@keyframes shakeX{0%,100%{transform:none;}25%{transform:translateX(-6px);}50%{transform:translateX(5px);}75%{transform:translateX(-3px);}}
+.opt-btn.shake{animation:shakeX .4s ease;}
+@keyframes popIn{0%{transform:scale(1);}45%{transform:scale(1.08);}100%{transform:scale(1);}}
+.opt-btn.pop{animation:popIn .45s ease;}
+.draw-rarity.show{display:block;animation:popIn .5s ease;}
+.progress-fill{position:relative;overflow:hidden;}
+.progress-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shine 1.8s infinite;}
+@keyframes shine{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+
+/* 漂浮星星背景 */
+.bg-star{position:fixed;border-radius:50%;background:#fff;pointer-events:none;z-index:0;animation:twinkle 4s ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.05;transform:translateY(0);}50%{opacity:.3;transform:translateY(-14px);}}
+
+/* 連續答對特效 */
+.combo-pop{position:fixed;top:34%;left:50%;transform:translate(-50%,-50%) scale(.6);z-index:350;background:linear-gradient(135deg,#f59e0b,#ec4899);color:#000;font-weight:900;font-size:clamp(17px,4.5vw,24px);padding:12px 26px;border-radius:40px;opacity:0;pointer-events:none;box-shadow:0 8px 30px rgba(245,158,11,.45);white-space:nowrap;}
+.combo-pop.show{animation:comboAnim 1.1s ease forwards;}
+@keyframes comboAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5);}18%{opacity:1;transform:translate(-50%,-50%) scale(1.12);}30%{transform:translate(-50%,-50%) scale(1);}80%{opacity:1;}100%{opacity:0;transform:translate(-50%,-62%) scale(.96);}}
+
+/* 加分漂浮 */
+.float-star{position:fixed;z-index:340;font-weight:900;color:var(--accent);font-size:20px;pointer-events:none;animation:floatUp .9s ease forwards;text-shadow:0 2px 8px rgba(0,0,0,.5);}
+@keyframes floatUp{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(-46px) scale(1.25);}}
+
+/* ════════════════════════════════════════
+   抽卡稀有度（依卡片自動判定）
+   ════════════════════════════════════════ */
+.draw-card-face{box-shadow:0 0 36px var(--glow,rgba(245,158,11,.5));}
+.draw-card-inner:not(.flipped){animation:cardWobble 1.7s ease-in-out infinite;}
+@keyframes cardWobble{0%,100%{transform:rotate(0);}25%{transform:rotate(-2deg);}75%{transform:rotate(2deg);}}
+.draw-rarity{font-size:14px;font-weight:900;border-radius:20px;padding:4px 18px;letter-spacing:2px;display:none;}
+.r-C{background:#475569;color:#e2e8f0;}
+.r-R{background:linear-gradient(135deg,#2563eb,#38bdf8);color:#fff;}
+.r-RR{background:linear-gradient(135deg,#7c3aed,#c084fc);color:#fff;}
+.r-SR{background:linear-gradient(135deg,#f59e0b,#ec4899);color:#000;}
+.r-UR{background:linear-gradient(90deg,#f43f5e,#f59e0b,#10b981,#3b82f6,#8b5cf6);background-size:300% 100%;color:#fff;animation:urShift 2.5s linear infinite;}
+@keyframes urShift{from{background-position:0 0;}to{background-position:300% 0;}}
+
+/* ════════════════════════════════════════
+   小遊戲
+   ════════════════════════════════════════ */
+.minigame-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}
+.minigame-card{background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(59,130,246,.14));border:1px solid rgba(139,92,246,.4);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s;}
+.minigame-card:active{transform:scale(.96);}
+.minigame-card .mg-icon{font-size:34px;margin-bottom:6px;animation:bounce 2.4s infinite;}
+.mg-title{font-size:15px;font-weight:800;}
+.mg-sub{font-size:11px;color:var(--text2);margin-top:4px;line-height:1.5;}
+.mg-overlay{position:fixed;inset:0;z-index:260;background:linear-gradient(135deg,#0f0c29,#24243e);display:none;flex-direction:column;padding:18px 16px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;}
+.mg-overlay.show{display:flex;}
+.mg-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;max-width:640px;width:100%;margin-inline:auto;}
+.mg-name{font-size:17px;font-weight:900;}
+.mg-close{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:20px;color:var(--text);padding:8px 16px;font-size:14px;cursor:pointer;font-family:inherit;}
+.mg-stats{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:440px;width:100%;margin:0 auto;}
+.mem-card{aspect-ratio:3/4;perspective:600px;cursor:pointer;}
+.mem-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .4s;}
+.mem-card.flip .mem-inner{transform:rotateY(180deg);}
+.mem-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:clamp(26px,7vw,40px);}
+.mem-back{background:linear-gradient(135deg,#1e40af,#7c3aed);border:1px solid rgba(255,255,255,.15);}
+.mem-front{transform:rotateY(180deg);background:var(--card-bg);border:2px solid var(--border);}
+.mem-card.done .mem-front{border-color:var(--green);box-shadow:0 0 14px rgba(16,185,129,.5);}
+.mem-card.done{pointer-events:none;}
+.spd-timerbar{height:10px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden;max-width:640px;width:100%;margin:0 auto 14px;}
+.spd-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));transition:width 1s linear;border-radius:10px;}
+.spd-fill.danger{background:linear-gradient(90deg,var(--red),var(--accent));}
+.spd-wrap{max-width:640px;width:100%;margin:0 auto;}
+.mg-result{max-width:440px;width:100%;margin:30px auto;text-align:center;display:none;}
+
+/* 動態效果減量（依使用者系統設定） */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
+}
 </style>
 </head>
 <body>
@@ -274,6 +412,19 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
           <div style="font-size:16px;font-weight:700;margin-bottom:5px">選擇科目開始本回合</div>
           <div style="font-size:13px;color:var(--text2)">每回合 10 題，答對 8 題以上即可抽卡</div>
           <div style="font-size:13px;color:var(--accent);margin-top:6px">💡 每回合有 1 次改答機會</div>
+        </div>
+        <div class="section-title">🎮 趣味小遊戲（每日通關可加抽 1 張卡）</div>
+        <div class="minigame-row">
+          <div class="minigame-card" onclick="openMemoryGame()">
+            <div class="mg-icon">🧩</div>
+            <div class="mg-title">記憶翻翻樂</div>
+            <div class="mg-sub">翻出所有配對<br><span id="mgMemBest">最佳：--</span></div>
+          </div>
+          <div class="minigame-card" onclick="openSpeedGame()">
+            <div class="mg-icon">⚡</div>
+            <div class="mg-title">限時搶答</div>
+            <div class="mg-sub">60 秒挑戰<br><span id="mgSpdBest">最佳：--</span></div>
+          </div>
         </div>
       </div>
       <div id="quizArea" style="display:none">
@@ -365,7 +516,7 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
     <!-- 世界地圖頁 -->
     <div id="pageMap" class="page">
       <div class="map-continent-tabs" id="continentTabs"></div>
-      <input type="text" id="flagSearch" placeholder="🔍 搜尋國家／縣市名稱..." oninput="filterFlags()" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:10px;">
+      <input type="text" id="flagSearch" placeholder="🔍 搜尋國家／縣市名稱..." oninput="filterFlags()" style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:11px 12px;color:var(--text);font-size:16px;font-family:inherit;margin-bottom:10px;">
       <!-- 國旗格 -->
       <div class="flag-grid" id="flagGrid"></div>
       <!-- 台灣縣市格 -->
@@ -404,7 +555,7 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
 
 <!-- ══ 抽卡動畫 ══ -->
 <div class="draw-overlay" id="drawOverlay">
-  <div class="draw-title">🎉 達標！答對 <span id="drawScore"></span>/10 題<br>翻開你的卡片！</div>
+  <div class="draw-title" id="drawTitle">🎉 達標！翻開你的卡片！</div>
   <div class="draw-card-wrap" onclick="flipCard()">
     <div class="draw-card-inner" id="drawCardInner">
       <div class="draw-card-face draw-card-back">🃏</div>
@@ -412,6 +563,7 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
     </div>
   </div>
   <div class="draw-tap-hint" id="drawHint">👆 點擊翻牌</div>
+  <div class="draw-rarity" id="drawRarity"></div>
   <div class="draw-card-name" id="drawCardName"></div>
   <button class="draw-btn-next" id="drawBtnNext" onclick="closeDrawAndContinue()">繼續 ➡️</button>
 </div>
@@ -484,6 +636,42 @@ body{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);min-
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- ══ 小遊戲：記憶翻翻樂 ══ -->
+<div class="mg-overlay" id="memoryOverlay">
+  <div class="mg-head">
+    <div class="mg-name">🧩 記憶翻翻樂</div>
+    <button class="mg-close" onclick="closeMemoryGame()">✕ 離開</button>
+  </div>
+  <div class="mg-stats">
+    <div class="chip">🕐 <span id="memTime">0</span> 秒</div>
+    <div class="chip">👆 <span id="memMoves">0</span> 次</div>
+    <div class="chip teal">✅ <span id="memMatched">0</span> / 8 組</div>
+  </div>
+  <div class="mem-grid" id="memGrid"></div>
+  <div class="mg-result" id="memResult"></div>
+</div>
+
+<!-- ══ 小遊戲：限時搶答 ══ -->
+<div class="mg-overlay" id="speedOverlay">
+  <div class="mg-head">
+    <div class="mg-name">⚡ 限時搶答</div>
+    <button class="mg-close" onclick="closeSpeedGame()">✕ 離開</button>
+  </div>
+  <div class="mg-stats">
+    <div class="chip">⏳ <span id="spdTime">60</span> 秒</div>
+    <div class="chip teal">✅ 答對 <span id="spdScore">0</span> 題</div>
+  </div>
+  <div class="spd-timerbar"><div class="spd-fill" id="spdFill" style="width:100%"></div></div>
+  <div class="spd-wrap" id="spdArea">
+    <div class="question-box"><div class="q-text" id="spdQText"></div></div>
+    <div class="options-grid" id="spdOptions"></div>
+  </div>
+  <div class="mg-result" id="spdResult"></div>
+</div>
+
+<div class="combo-pop" id="comboPop"></div>
+<canvas id="confettiCanvas" style="position:fixed;inset:0;z-index:600;pointer-events:none;"></canvas>
 
 <script>
 // ════════════════════════════════════════
@@ -1065,7 +1253,7 @@ function login(id){
   document.getElementById('settingTotal').textContent=p.totalCorrect;
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('gameScreen').style.display='block';
-  renderSubjectTabs();showSubjectPicker();updateCollStats();
+  renderSubjectTabs();showSubjectPicker();updateCollStats();updateMiniBest();
 }
 function logout(){
   S.currentId=null;
@@ -1126,6 +1314,7 @@ function startRound(){
   R.currentIdx=0;R.answers=new Array(ROUND_TOTAL).fill(null);
   R.changed=new Array(ROUND_TOTAL).fill(false);
   R.changeUsed=false;R.pendingChange=false;R.correctCount=0;
+  _streak=0;
   document.getElementById('subjectPicker').style.display='none';
   document.getElementById('quizArea').style.display='block';
   document.getElementById('resultArea').style.display='none';
@@ -1166,12 +1355,15 @@ function renderQuestion(){
   document.getElementById('explanationBox').style.display='none';
   document.getElementById('explanationBox').innerHTML='';
   R.pendingChange=false;
+  // 題目滑入動畫
+  const qb=document.querySelector('#quizArea .question-box'),og=document.getElementById('optionsGrid');
+  [qb,og].forEach(el=>{el.classList.remove('anim-in');void el.offsetWidth;el.classList.add('anim-in');});
 }
 
 function answer(idx,isCorrect){
   // ── 改答模式：等待玩家重新選擇 ──
   if(R.pendingChange){
-    const btns=document.querySelectorAll('.opt-btn');
+    const btns=document.querySelectorAll('#optionsGrid .opt-btn');
     // 不能點已標錯或已標對的按鈕
     if(btns[idx].classList.contains('wrong')||btns[idx].classList.contains('correct')) return;
     // 清除改答狀態
@@ -1194,7 +1386,7 @@ function answer(idx,isCorrect){
     // 答錯且尚有改答機會：只標記錯誤選項，其他保持可點
     R.pendingChange=true;
     document.getElementById('changeHint').classList.add('show');
-    const btns=document.querySelectorAll('.opt-btn');
+    const btns=document.querySelectorAll('#optionsGrid .opt-btn');
     btns[idx].classList.add('wrong'); // 標記這個是錯的
     btns.forEach((b,i)=>{
       if(i!==idx){
@@ -1211,11 +1403,14 @@ function answer(idx,isCorrect){
 
 function lockOptions(selectedIdx,isCorrect){
   const q=R.questions[R.currentIdx];
-  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+  document.querySelectorAll('#optionsGrid .opt-btn').forEach((b,i)=>{
     b.classList.add('disabled');
     b.classList.remove('changeable');
-    if(q.shuffled[i].correct) b.classList.add('correct');
-    else if(i===selectedIdx&&!isCorrect) b.classList.add('wrong');
+    if(q.shuffled[i].correct){
+      b.classList.add('correct');
+      if(isCorrect&&i===selectedIdx) b.classList.add('pop');
+    }
+    else if(i===selectedIdx&&!isCorrect) b.classList.add('wrong','shake');
   });
   // 顯示解析
   const box=document.getElementById('explanationBox');
@@ -1235,6 +1430,9 @@ function lockOptions(selectedIdx,isCorrect){
 function recordAnswer(isCorrect){
   R.answers[R.currentIdx]=isCorrect;
   if(isCorrect) R.correctCount++;
+  // 連擊與加分特效
+  if(isCorrect){_streak++;floatStar('+1 ⭐');if(_streak>=3)showCombo(_streak);}
+  else _streak=0;
   document.getElementById('qDots').innerHTML=R.questions.map((_,i)=>{
     let cls='q-dot';
     const done=R.answers[i]!==null;
@@ -1276,7 +1474,8 @@ function showResult(){
   document.getElementById('resultEmoji').textContent=pass?'🎉':'😅';
   document.getElementById('resultTitle').textContent=pass?'達標！可以抽卡！':'繼續加油！';
   document.getElementById('resultSub').textContent=pass?`答對 ${R.correctCount} 題，超棒！`:`差一點！再試一次！（需答對 ${ROUND_PASS} 題）`;
-  document.getElementById('scoreBig').textContent=R.correctCount;
+  countUp(document.getElementById('scoreBig'),R.correctCount);
+  if(pass) fireConfetti(120);
   document.getElementById('scoreCircle').className='score-circle'+(pass?'':' fail');
   document.getElementById('rCorrect').textContent=R.correctCount+' / '+ROUND_TOTAL;
   document.getElementById('rChanged').textContent=R.changed.some(c=>c)?'✅ 使用 1 次':'未使用';
@@ -1295,15 +1494,24 @@ function startNewRound(){showSubjectPicker();}
 let cardFlipped=false,pendingCard=null;
 function triggerDraw(){
   document.getElementById('btnDraw').disabled=true;
+  openCardDraw(`🎉 達標！答對 ${R.correctCount}/10 題<br>翻開你的卡片！`);
+}
+function openCardDraw(title){
   pendingCard=getUncollectedCard();
-  if(!pendingCard){showToast('請確認伺服器連線後再試',true);return;}
+  if(!pendingCard){
+    showToast('卡池載入中，請稍候再試',true);
+    const b=document.getElementById('btnDraw');if(b)b.disabled=false;
+    return;
+  }
   cardFlipped=false;
   document.getElementById('drawCardInner').classList.remove('flipped');
+  document.querySelector('.draw-card-wrap').style.removeProperty('--glow');
   document.getElementById('drawCardImg').src='';
   document.getElementById('drawHint').style.display='block';
   document.getElementById('drawBtnNext').classList.remove('show');
   document.getElementById('drawCardName').textContent='';
-  document.getElementById('drawScore').textContent=R.correctCount;
+  const rEl=document.getElementById('drawRarity');rEl.className='draw-rarity';rEl.textContent='';
+  document.getElementById('drawTitle').innerHTML=title;
   document.getElementById('drawOverlay').classList.add('show');
   document.getElementById('drawCardImg').src=cardUrl(pendingCard);
 }
@@ -1313,6 +1521,13 @@ function flipCard(){
   document.getElementById('drawHint').style.display='none';
   const name=pendingCard.replace(/\.[^.]+$/,'');
   document.getElementById('drawCardName').textContent='✨ '+name+' 已收藏！';
+  // 稀有度特效
+  const rar=cardRarity(pendingCard),info=RARITY[rar];
+  const rEl=document.getElementById('drawRarity');
+  rEl.textContent=info.label;
+  rEl.className='draw-rarity show r-'+rar;
+  document.querySelector('.draw-card-wrap').style.setProperty('--glow',info.glow);
+  if(info.confetti) setTimeout(()=>fireConfetti(info.confetti),350);
   const p=cur();
   if(!p.collected.includes(pendingCard)){
     p.collected.push(pendingCard);
@@ -2125,6 +2340,273 @@ function showToast(msg,error=false){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className='toast show'+(error?' error':'');
   clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2700);
+}
+
+// ════════════════════════════════════════
+// 遊戲化強化：特效引擎
+// ════════════════════════════════════════
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// 漂浮星星背景
+(function(){
+  if(REDUCED) return;
+  for(let i=0;i<14;i++){
+    const s=document.createElement('div');s.className='bg-star';
+    const sz=2+Math.random()*3;
+    s.style.width=sz+'px';s.style.height=sz+'px';
+    s.style.left=(Math.random()*100)+'%';s.style.top=(Math.random()*100)+'%';
+    s.style.animationDelay=(Math.random()*4)+'s';
+    s.style.animationDuration=(3+Math.random()*4)+'s';
+    document.body.appendChild(s);
+  }
+})();
+
+// 紙花特效
+const _cfc=document.getElementById('confettiCanvas'),_cfx=_cfc.getContext('2d');
+let _cfP=[],_cfOn=false;
+function _cfSize(){_cfc.width=innerWidth;_cfc.height=innerHeight;}
+addEventListener('resize',_cfSize);_cfSize();
+function fireConfetti(n=90,colors=['#f59e0b','#ec4899','#10b981','#3b82f6','#8b5cf6','#f43f5e']){
+  if(REDUCED) return;
+  for(let i=0;i<n;i++){
+    _cfP.push({x:Math.random()*_cfc.width,y:-20-Math.random()*_cfc.height*.3,vx:(Math.random()-.5)*3,vy:2+Math.random()*3.5,s:5+Math.random()*6,r:Math.random()*Math.PI,vr:(Math.random()-.5)*.25,c:colors[Math.floor(Math.random()*colors.length)]});
+  }
+  if(!_cfOn){_cfOn=true;requestAnimationFrame(_cfTick);}
+}
+function _cfTick(){
+  _cfx.clearRect(0,0,_cfc.width,_cfc.height);
+  _cfP=_cfP.filter(p=>p.y<_cfc.height+30);
+  for(const p of _cfP){
+    p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+    _cfx.save();_cfx.translate(p.x,p.y);_cfx.rotate(p.r);
+    _cfx.fillStyle=p.c;_cfx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);
+    _cfx.restore();
+  }
+  if(_cfP.length) requestAnimationFrame(_cfTick);
+  else{_cfOn=false;_cfx.clearRect(0,0,_cfc.width,_cfc.height);}
+}
+
+// 連擊與加分漂浮
+let _streak=0;
+function showCombo(n){
+  const el=document.getElementById('comboPop');
+  el.textContent=`🔥 連續答對 ${n} 題！`;
+  el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
+}
+function floatStar(txt='+1 ⭐'){
+  if(REDUCED) return;
+  const el=document.createElement('div');el.className='float-star';el.textContent=txt;
+  el.style.left=(38+Math.random()*24)+'%';el.style.top='42%';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),950);
+}
+
+// 分數滾動
+function countUp(el,to,dur=700){
+  if(REDUCED||!to){el.textContent=to;return;}
+  const t0=performance.now();
+  function tick(t){
+    const k=Math.min((t-t0)/dur,1);
+    el.textContent=Math.round(to*(1-Math.pow(1-k,3)));
+    if(k<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ════════════════════════════════════════
+// 卡片稀有度（依檔名自動判定，同一張卡稀有度固定）
+// ════════════════════════════════════════
+const RARITY={
+  C: {label:'C ‧ 普通',     glow:'rgba(148,163,184,.45)', confetti:0},
+  R: {label:'R ‧ 稀有',     glow:'rgba(59,130,246,.6)',   confetti:40},
+  RR:{label:'RR ‧ 雙重稀有', glow:'rgba(168,85,247,.65)',  confetti:80},
+  SR:{label:'SR ‧ 超稀有',  glow:'rgba(245,158,11,.75)',  confetti:140},
+  UR:{label:'UR ‧ 究極稀有', glow:'rgba(244,63,94,.8)',    confetti:220},
+};
+function cardRarity(f){
+  let h=0;
+  for(let i=0;i<f.length;i++) h=(h*31+f.charCodeAt(i))>>>0;
+  const r=h%100;
+  return r<3?'UR':r<10?'SR':r<25?'RR':r<55?'R':'C';
+}
+
+// ════════════════════════════════════════
+// 小遊戲共用
+// ════════════════════════════════════════
+function miniBestData(){
+  const p=cur();if(!p) return null;
+  p.mini=p.mini||{memBestTime:null,memBestMoves:null,spdBest:0,reward:{}};
+  p.mini.reward=p.mini.reward||{};
+  return p.mini;
+}
+function updateMiniBest(){
+  const m=miniBestData();if(!m) return;
+  const a=document.getElementById('mgMemBest'),b=document.getElementById('mgSpdBest');
+  if(a) a.textContent=m.memBestTime!=null?`最佳：${m.memBestTime} 秒`:'最佳：--';
+  if(b) b.textContent=m.spdBest?`最佳：${m.spdBest} 題`:'最佳：--';
+}
+function miniRewardAvailable(key){
+  const m=miniBestData();
+  return m&&m.reward[key]!==todayKey();
+}
+function claimMiniReward(key,title){
+  const m=miniBestData();if(!m) return;
+  m.reward[key]=todayKey();saveAll();
+  openCardDraw(title);
+}
+
+// ════════════════════════════════════════
+// 小遊戲一：記憶翻翻樂
+// ════════════════════════════════════════
+const MEM_ICONS=['⚡','🔥','💧','🌿','⭐','❄️','🐉','🦊'];
+let MEM={deck:[],first:null,lock:false,moves:0,matched:0,sec:0,timer:null};
+function openMemoryGame(){
+  MEM.deck=[...MEM_ICONS,...MEM_ICONS].sort(()=>Math.random()-.5);
+  MEM.first=null;MEM.lock=false;MEM.moves=0;MEM.matched=0;MEM.sec=0;
+  clearInterval(MEM.timer);
+  MEM.timer=setInterval(()=>{MEM.sec++;document.getElementById('memTime').textContent=MEM.sec;},1000);
+  document.getElementById('memTime').textContent=0;
+  document.getElementById('memMoves').textContent=0;
+  document.getElementById('memMatched').textContent=0;
+  document.getElementById('memResult').style.display='none';
+  const grid=document.getElementById('memGrid');
+  grid.style.display='grid';
+  grid.innerHTML=MEM.deck.map((ic,i)=>`
+    <div class="mem-card" id="mem${i}" onclick="memFlip(${i})">
+      <div class="mem-inner">
+        <div class="mem-face mem-back">❓</div>
+        <div class="mem-face mem-front">${ic}</div>
+      </div>
+    </div>`).join('');
+  document.getElementById('memoryOverlay').classList.add('show');
+}
+function memFlip(i){
+  if(MEM.lock) return;
+  const el=document.getElementById('mem'+i);
+  if(el.classList.contains('flip')) return;
+  el.classList.add('flip');
+  if(MEM.first===null){MEM.first=i;return;}
+  MEM.moves++;document.getElementById('memMoves').textContent=MEM.moves;
+  const a=MEM.first;MEM.first=null;
+  if(MEM.deck[a]===MEM.deck[i]){
+    MEM.matched++;document.getElementById('memMatched').textContent=MEM.matched;
+    document.getElementById('mem'+a).classList.add('done');el.classList.add('done');
+    floatStar('✨');
+    if(MEM.matched===8) memWin();
+  }else{
+    MEM.lock=true;
+    setTimeout(()=>{
+      document.getElementById('mem'+a).classList.remove('flip');
+      el.classList.remove('flip');MEM.lock=false;
+    },700);
+  }
+}
+function memWin(){
+  clearInterval(MEM.timer);
+  fireConfetti(120);
+  const m=miniBestData();let newBest=false;
+  if(m&&(m.memBestTime==null||MEM.sec<m.memBestTime)){m.memBestTime=MEM.sec;m.memBestMoves=MEM.moves;newBest=true;saveAll();}
+  const canReward=miniRewardAvailable('memory');
+  document.getElementById('memGrid').style.display='none';
+  const res=document.getElementById('memResult');
+  res.style.display='block';
+  res.innerHTML=`
+    <div style="font-size:60px;margin-bottom:8px">🎉</div>
+    <div style="font-size:22px;font-weight:900;margin-bottom:6px">全部配對成功！</div>
+    <div style="color:var(--text2);font-size:14px;margin-bottom:16px">用時 ${MEM.sec} 秒 ‧ 翻了 ${MEM.moves} 次${newBest?'<br>🏅 刷新最佳紀錄！':''}</div>
+    ${canReward?`<button class="btn btn-primary" style="margin-bottom:10px" onclick="memClaim()">🎴 領取今日獎勵：抽 1 張卡！</button>`:`<div style="color:var(--text2);font-size:13px;margin-bottom:10px">今日獎勵已領取，明天再來！</div>`}
+    <button class="btn btn-secondary" onclick="openMemoryGame()">再玩一次</button>`;
+  updateMiniBest();
+}
+function memClaim(){
+  closeMemoryGame();
+  claimMiniReward('memory','🧩 記憶翻翻樂通關！<br>翻開你的卡片！');
+}
+function closeMemoryGame(){
+  clearInterval(MEM.timer);
+  document.getElementById('memoryOverlay').classList.remove('show');
+  updateMiniBest();
+}
+
+// ════════════════════════════════════════
+// 小遊戲二：限時搶答（60 秒混合九科）
+// ════════════════════════════════════════
+const SPD_TIME=60,SPD_PASS=6;
+let SPD={pool:[],idx:0,score:0,left:60,timer:null,lock:false,cur:null};
+function openSpeedGame(){
+  let pool=[];
+  for(const k in QUESTIONS) pool=pool.concat(QUESTIONS[k]);
+  pool=pool.slice().sort(()=>Math.random()-.5);
+  SPD.pool=pool;SPD.idx=0;SPD.score=0;SPD.left=SPD_TIME;SPD.lock=false;
+  clearInterval(SPD.timer);
+  document.getElementById('spdScore').textContent=0;
+  document.getElementById('spdTime').textContent=SPD_TIME;
+  const fill=document.getElementById('spdFill');
+  fill.style.width='100%';fill.className='spd-fill';
+  document.getElementById('spdResult').style.display='none';
+  document.getElementById('spdArea').style.display='block';
+  document.getElementById('speedOverlay').classList.add('show');
+  SPD.timer=setInterval(()=>{
+    SPD.left--;
+    document.getElementById('spdTime').textContent=SPD.left;
+    fill.style.width=(SPD.left/SPD_TIME*100)+'%';
+    if(SPD.left<=10) fill.classList.add('danger');
+    if(SPD.left<=0) spdEnd();
+  },1000);
+  spdRender();
+}
+function spdRender(){
+  const q=SPD.pool[SPD.idx];
+  if(!q){spdEnd();return;}
+  const pairs=q.opts.map((o,i)=>({o,c:i===q.ans})).sort(()=>Math.random()-.5);
+  SPD.cur=pairs;
+  document.getElementById('spdQText').textContent=q.q;
+  document.getElementById('spdOptions').innerHTML=pairs.map((p,i)=>
+    `<button class="opt-btn" id="spdOpt${i}" onclick="spdAnswer(${i})">${p.o}</button>`).join('');
+  const qb=document.querySelector('#speedOverlay .question-box');
+  qb.classList.remove('anim-in');void qb.offsetWidth;qb.classList.add('anim-in');
+}
+function spdAnswer(i){
+  if(SPD.lock) return;SPD.lock=true;
+  const ok=SPD.cur[i].c;
+  const btn=document.getElementById('spdOpt'+i);
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok) btn.classList.add('shake');
+  if(ok){
+    SPD.score++;
+    document.getElementById('spdScore').textContent=SPD.score;
+    floatStar('+1 ⭐');
+  }else{
+    SPD.cur.forEach((p,j)=>{if(p.c)document.getElementById('spdOpt'+j).classList.add('correct');});
+  }
+  setTimeout(()=>{SPD.idx++;SPD.lock=false;spdRender();},ok?260:650);
+}
+function spdEnd(){
+  if(!SPD.timer&&document.getElementById('spdResult').style.display==='block') return;
+  clearInterval(SPD.timer);SPD.timer=null;
+  const m=miniBestData();let newBest=false;
+  if(m&&SPD.score>(m.spdBest||0)){m.spdBest=SPD.score;newBest=true;saveAll();}
+  const pass=SPD.score>=SPD_PASS;
+  if(pass) fireConfetti(120);
+  const canReward=pass&&miniRewardAvailable('speed');
+  document.getElementById('spdArea').style.display='none';
+  const res=document.getElementById('spdResult');
+  res.style.display='block';
+  res.innerHTML=`
+    <div style="font-size:60px;margin-bottom:8px">${pass?'🎉':'⏰'}</div>
+    <div style="font-size:22px;font-weight:900;margin-bottom:6px">${pass?'挑戰成功！':'時間到！'}</div>
+    <div style="color:var(--text2);font-size:14px;margin-bottom:16px">60 秒內答對 <b style="color:var(--green)">${SPD.score}</b> 題（達標需 ${SPD_PASS} 題）${newBest?'<br>🏅 刷新最佳紀錄！':''}</div>
+    ${canReward?`<button class="btn btn-primary" style="margin-bottom:10px" onclick="spdClaim()">🎴 領取今日獎勵：抽 1 張卡！</button>`:pass?`<div style="color:var(--text2);font-size:13px;margin-bottom:10px">今日獎勵已領取，明天再來！</div>`:''}
+    <button class="btn btn-secondary" onclick="openSpeedGame()">再挑戰一次</button>`;
+  updateMiniBest();
+}
+function spdClaim(){
+  closeSpeedGame();
+  claimMiniReward('speed','⚡ 限時搶答達標！<br>翻開你的卡片！');
+}
+function closeSpeedGame(){
+  clearInterval(SPD.timer);SPD.timer=null;
+  document.getElementById('speedOverlay').classList.remove('show');
+  updateMiniBest();
 }
 </script>
 </body>
