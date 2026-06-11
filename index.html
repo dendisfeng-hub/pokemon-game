@@ -946,6 +946,11 @@ function newProfile(name,avatar){
 // 伺服器 & 卡池
 // ════════════════════════════════════════
 async function checkServer(){
+  // GitHub Pages 模式：不需要伺服器，直接顯示雲端模式
+  const isGitHubPages = window.location.hostname.includes('github.io');
+  if(isGitHubPages){
+    setStatus(true,'☁️ 雲端模式（無卡圖）');return false;
+  }
   try{
     const r=await fetch(`${SERVER}/api/cards?page=1`,{signal:AbortSignal.timeout(3000)});
     if(r.ok){const d=await r.json();setStatus(true,`已連線 · ${d.total} 張卡`);return true;}
@@ -1850,8 +1855,14 @@ const FLAG_DATA = [
 
 // 國旗圖片路徑（優先用本機，否則用線上）
 const FLAG_SERVER = window.location.origin;
+const FLAG_BASE = (()=>{
+  // 自動偵測：本機伺服器用 /flags/，GitHub Pages 用 /pokemon-game/flags/
+  const path = window.location.pathname;
+  if(path.startsWith('/pokemon-game')) return FLAG_SERVER + '/pokemon-game/flags';
+  return FLAG_SERVER + '/flags';
+})();
 function flagUrl(code){
-  return `${FLAG_SERVER}/flags/${code}.png`;
+  return `${FLAG_BASE}/${code}.png`;
 }
 
 // ════════════════════════════════════════
